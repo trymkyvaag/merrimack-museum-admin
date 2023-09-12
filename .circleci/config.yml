@@ -33,3 +33,8 @@ jobs:
       - store_artifacts:
           path: test-reports/
           destination: python_app
+
+workflows:
+  say_hello:
+    jobs:
+      - build
