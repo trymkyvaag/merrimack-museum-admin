@@ -9,11 +9,11 @@ jobs:
           password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
-      -run:
-          name: MACOS mysqlclient Install
-          command: |
-            brew install mysql pkg-config
-            pip install mysqlclient
+      # -run:
+      #     name: MACOS mysqlclient Install
+      #     command: |
+      #       brew install mysql pkg-config
+      #       pip install mysqlclient
       - restore_cache:
           key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
       - run:
