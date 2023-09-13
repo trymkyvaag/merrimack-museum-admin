@@ -1,14 +1,41 @@
 version: 2.1
 
 jobs:
-  hello-job:
+  build:
     docker:
-      - image: cimg/node:17.2.0 # the primary container, where your job's commands are run
+      - image: python:3.8  # Use the desired Python version
     steps:
-      - checkout # check out the code in the project directory
-      - run: echo "hello world" # run the `echo` command
+      - checkout  # Checkout your source code
+      
+      - run:
+          name: Install system dependencies
+          command: |
+            apt-get update
+            apt-get install -y mysql-client
+
+      - run:
+          name: Install Python dependencies
+          command: pip install -r requirements.txt
+
+      - run:
+          name: Set up database
+          command: |
+            python manage.py migrate
+            python manage.py collectstatic --noinput
+
+      - run:
+          name: Run tests
+          command: python manage.py test
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
+
+      - store_test_results:
+          path: test-reports
 
 workflows:
-  my-workflow:
+  version: 2
+  build_and_test:
     jobs:
-      - hello-job
+      - build
