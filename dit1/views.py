@@ -6,16 +6,11 @@ from .models import Artist, Artwork
 # Create your views here.
 
 
-def artwork_list(request):
-    artworks = Artwork.objects.filter(idartwork=180)
-    return render(request, "artwork_list.html", {"artworks": artworks})
-
-
+# This view will take name as a parmater, and return all data
 def search_by_artist(request):
-    matching_artists = Artist.objects.filter(artist_name__icontains="Kevin")
+    matching_artists = Artist.objects.filter(artist_name__icontains="Kidd")
 
-    artist_ids = [artist.idartist for artist in matching_artists]
-
-    artworks = Artwork.objects.filter(artist_id__in=artist_ids)
-    
+    artworks = Artwork.objects.filter(artist__in=matching_artists).prefetch_related(
+        "location", "category"
+    )
     return render(request, "artwork_list.html", {"artworks": artworks})

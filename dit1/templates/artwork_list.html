@@ -10,7 +10,8 @@
     <ul>
         {% for artwork in artworks %}
         <li>"{{ artwork.title }}" by {{ artwork.artist.artist_name }} Width: {{artwork.width}} Height:
-            {{artwork.height}}
+            {{artwork.location.location}} Date Created: {{ artwork.date_created_month }}/{{ artwork.date_created_year }}
+            Comments: {{artwork.comments|default:""}}
         </li>
         {% empty %}
         <li>No artworks available.</li>
