@@ -1,7 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from .models import Artist, Artwork
 
 
 # Create your views here.
-def index(request):
-    return HttpResponse("Hello, world. You're at the dit1 index.")
+
+
+def artwork_list(request):
+    artworks = Artwork.objects.all()
+    return render(request, "artwork_list.html", {"artworks": artworks})
