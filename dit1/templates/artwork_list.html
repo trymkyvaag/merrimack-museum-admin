@@ -9,7 +9,9 @@
     <h1>Artwork List</h1>
     <ul>
         {% for artwork in artworks %}
-        <li>{{ artwork.title }} by {{ artwork.artist.artist_name }}</li>
+        <li>"{{ artwork.title }}" by {{ artwork.artist.artist_name }} Width: {{artwork.width}} Height:
+            {{artwork.height}}
+        </li>
         {% empty %}
         <li>No artworks available.</li>
         {% endfor %}
