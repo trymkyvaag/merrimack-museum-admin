@@ -2,13 +2,10 @@ import requests
 
 
 def update_artwork(artwork_id, updated_data):
-    # Define the base URL of your API
+
+    # Need to get data that is currently there before new is set
     base_url = 'http://localhost:3000'
-
-    # Define the URL for the specific artwork using its ID
     url = f'{base_url}/gallery/{artwork_id}/'
-
-    # Make the PUT request
     response = requests.put(url, json=updated_data)
 
     if response.status_code == 200:
