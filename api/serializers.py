@@ -34,11 +34,11 @@ class CategorySerializer(serializers.ModelSerializer):
 # Artwork table, handles attributes and foreign keys
 class ArtworkSerializer(serializers.ModelSerializer):
     # Foreign keys, not used when creating
-    # or updating model instances based on incoming data
-    artist_name = serializers.CharField()
-    donor_name = serializers.CharField(required=False)
-    location = serializers.CharField()
-    category = serializers.CharField()
+    # or updating model instances based on incoming data (write-only set to True)
+    artist_name = serializers.CharField(write_only=True)
+    donor_name = serializers.CharField(write_only=True, required=False)
+    location = serializers.CharField(write_only=True)
+    category = serializers.CharField(write_only=True)
 
     class Meta:
         model = Artwork
