@@ -1,9 +1,11 @@
-from django.contrib import admin
 from django.urls import path
-from .views import CreateArtworkView, CreateArtistView
+from .views import CreateArtworkView
 
 urlpatterns = [
-    path("create-artwork", CreateArtworkView.as_view()),
-    path("create-artist", CreateArtistView.as_view()),
-
+    path(
+        # end-point for adding new artwork to db
+        "add-artwork",
+        CreateArtworkView.as_view(),
+    ),
+    # path("create-artist", CreateArtistView.as_view()),
 ]
