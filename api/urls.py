@@ -1,5 +1,9 @@
 from django.contrib import admin
 from django.urls import path
-from .views import ArtistSearch
+from .views import CreateArtworkView, CreateArtistView
 
-urlpatterns = [path("home", ArtistSearch.as_view())]
+urlpatterns = [
+    path("create-artwork", CreateArtworkView.as_view()),
+    path("create-artist", CreateArtistView.as_view()),
+
+]
