@@ -46,7 +46,8 @@ class UserSerializer(serializers.ModelSerializer):
 
         if not existing_user:
             # Get or create the UserType instance with a user_type of "3"
-            user_type, created = UserType.objects.get_or_create(user_type="student")
+            user_type, created = UserType.objects.get_or_create(
+                user_type="student")
             validated_data["user_type"] = user_type
             user = User.objects.create(**validated_data)
             return user.user_type

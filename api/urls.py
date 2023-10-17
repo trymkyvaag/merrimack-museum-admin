@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CreateArtworkView, ArtworkSearchView,  AddUserEmail
+from .views import CreateArtworkView, ArtworkSearchView
 
 urlpatterns = [
     path(
@@ -13,10 +13,5 @@ urlpatterns = [
         "searchartwork/",
         ArtworkSearchView.as_view(),
 
-    ),
-    path(
-        # end-point for adding user to db
-        "add-user/",
-        AddUserEmail.as_view(),
     ),
 ]
