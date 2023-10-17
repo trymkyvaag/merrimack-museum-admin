@@ -120,67 +120,12 @@ class ArtworkSerializer(serializers.ModelSerializer):
         return artwork_instance
 
 
-# Artwork table, handles attributes and foreign keys
-class ArtworkSearchSerializer(serializers.ModelSerializer):
+class ArtworkSearchSerializer(serializers.Serializer):
     location = serializers.CharField(required=False)
     donor = serializers.CharField(required=False)
     name = serializers.CharField(required=False)
-    artist = serializers.CharField(required=False)
+    artist_name = serializers.CharField(required=False)
 
-    class Meta:
-        fields = ('location', 'donor', 'name', 'artist')
 
-    class Meta:
-        model = Artwork
-        # Fields to include when serializing or deserializing
-        fields = (
-            "title",
-            "artist",
-            "donor",
-            "name",
-            "location",
-            "category",
-        )
-
-    def search(self, validated_data):
-        # Extract artist_name, donor_name, location_name, and category_name from the validated data
-        artist_name = validated_data.get("artist")
-        donor_name = validated_data.get("donor")
-        location_name = validated_data.get("location")
-        category_name = validated_data.get("category")
-
-        # Initialize variables for the instances
-        artist_instance = None
-        donor_instance = None
-        location_instance = None
-        category_instance = None
-
-        # Get the Artist instance if artist_name is provided
-        if artist_name:
-            artist_instance = Artist.objects.filter(
-                artist_name=artist_name).first()
-
-        # Get the Donor instance if donor_name is provided
-        if donor_name:
-            donor_instance = Donor.objects.filter(
-                donor_name=donor_name).first()
-
-        # Get the Location instance if location_name is provided
-        if location_name:
-            location_instance = Location.objects.filter(
-                location=location_name).first()
-
-        # Get the Category instance if category_name is provided
-        if category_name:
-            category_instance = Category.objects.filter(
-                category=category_name).first()
-
-        # You can return these objects as a dictionary or a list, depending on your needs
-        result = {
-            "artist_instance": artist_instance,
-            "donor_instance": donor_instance,
-            "location_instance": location_instance,
-            "category_instance": category_instance,
-        }
-
-        return result
+class ArtworkSearchInputSerializer(serializers.Serializer):
+    keyword = serializers.CharField()

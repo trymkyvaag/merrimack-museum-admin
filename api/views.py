@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from api.models import Artwork
-from .serializers import ArtworkSerializer
+from .serializers import ArtworkSearchInputSerializer, ArtworkSearchSerializer, ArtworkSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -25,29 +25,22 @@ class CreateArtworkView(APIView):
 
 
 class ArtworkSearchView(APIView):
-    def get(self, request, *args, **kwargs):
-        location = request.query_params.get('location', None)
-        donor = request.query_params.get('donor', None)
-        name = request.query_params.get('name', None)
-        artist_name = request.query_params.get('artist_name', None)
+    def post(self, request):
+        # IDK what to call this but for now just keyword
+        keyword = request.data.get('keyword')
+        print(f"Keyword recieved: {keyword}")
+        if keyword:
+            queryset = Artwork.objects.filter(
+                Q(title__icontains=keyword) |
+                Q(location__location__icontains=keyword) |
+                Q(donor__donor_name__icontains=keyword) |
+                Q(artist__artist_name__icontains=keyword)
+                # Add more fields here as needed
+            )
+        else:
+            # Return an empty queryset if no keyword is provided.
+            queryset = Artwork.objects.none()
 
-        # Perform the search
-        queryset = Artwork.objects.all()
-
-        if location:
-            queryset = queryset.filter(
-                Q(location__location__icontains=location))
-
-        if donor:
-            queryset = queryset.filter(Q(donor__donor_name__icontains=donor))
-
-        if name:
-            queryset = queryset.filter(Q(name__icontains=name))
-
-        if artist_name:
-            queryset = queryset.filter(
-                Q(artist__artist_name__icontains=artist_name))
-
-        # Serialize the results
         results = ArtworkSerializer(queryset, many=True)
+
         return Response(results.data, status=status.HTTP_200_OK)
