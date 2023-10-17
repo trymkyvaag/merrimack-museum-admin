@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CreateArtworkView
+from .views import CreateArtworkView, ArtworkSearchView
 
 urlpatterns = [
     path(
@@ -7,5 +7,11 @@ urlpatterns = [
         "addartwork/",
         CreateArtworkView.as_view(),
     ),
-    # path("create-artist", CreateArtistView.as_view()),
+
+    path(
+        # end-point for searching for artwork
+        "searchartwork/",
+        ArtworkSearchView.as_view(),
+
+    )
 ]
