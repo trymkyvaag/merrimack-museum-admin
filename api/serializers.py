@@ -120,11 +120,11 @@ class ArtworkSerializer(serializers.ModelSerializer):
         return artwork_instance
 
 
-class ArtworkSearchSerializer(serializers.Serializer):
-    location = serializers.CharField(required=False)
-    donor = serializers.CharField(required=False)
-    name = serializers.CharField(required=False)
-    artist_name = serializers.CharField(required=False)
+# class ArtworkSearchSerializer(serializers.Serializer):
+#     location = serializers.CharField(required=False)
+#     donor = serializers.CharField(required=False)
+#     name = serializers.CharField(required=False)
+#     artist_name = serializers.CharField(required=False)
 
 
 class ArtworkSearchInputSerializer(serializers.Serializer):
