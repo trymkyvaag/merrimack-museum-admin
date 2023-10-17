@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from api.models import Artwork
-from .serializers import ArtworkSearchInputSerializer, ArtworkSearchSerializer, ArtworkSerializer
+from .serializers import ArtworkSearchInputSerializer, ArtworkSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
