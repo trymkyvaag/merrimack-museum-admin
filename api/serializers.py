@@ -33,9 +33,11 @@ class CategorySerializer(serializers.ModelSerializer):
 
 # Category table, pk auto generated
 class UserSerializer(serializers.ModelSerializer):
+    user_type = serializers.ReadOnlyField()
+
     class Meta:
         model = User
-        fields = ["address"]
+        fields = ["address", "user_type"]
 
     def create(self, validated_data):
         address = validated_data.get("address")
@@ -47,7 +49,7 @@ class UserSerializer(serializers.ModelSerializer):
             user_type, created = UserType.objects.get_or_create(user_type="student")
             validated_data["user_type"] = user_type
             user = User.objects.create(**validated_data)
-            return user
+            return user.user_type
         else:
             return existing_user
 
