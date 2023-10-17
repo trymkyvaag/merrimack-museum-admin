@@ -205,7 +205,7 @@ class Location(models.Model):
 
 
 class MoveRequest(models.Model):
-    idmove_request = models.IntegerField(primary_key=True)
+    idmove_request = models.AutoField(primary_key=True)
     artwork = models.ForeignKey(Artwork, models.DO_NOTHING, blank=True, null=True)
     location = models.ForeignKey(Location, models.DO_NOTHING, blank=True, null=True)
     to_location = models.CharField(max_length=30, blank=True, null=True)
@@ -219,7 +219,7 @@ class MoveRequest(models.Model):
 
 
 class Privs(models.Model):
-    idprivs = models.IntegerField(primary_key=True)
+    idprivs = models.AutoField(primary_key=True)
     privs = models.CharField(max_length=5, blank=True, null=True)
 
     class Meta:
@@ -228,7 +228,7 @@ class Privs(models.Model):
 
 
 class RequestType(models.Model):
-    idrequest_type = models.IntegerField(primary_key=True)
+    idrequest_type = models.AutoField(primary_key=True)
     request_type = models.CharField(max_length=20, blank=True, null=True)
     user = models.ForeignKey("User", models.DO_NOTHING, blank=True, null=True)
 
@@ -238,7 +238,7 @@ class RequestType(models.Model):
 
 
 class User(models.Model):
-    iduser = models.IntegerField(primary_key=True)
+    iduser = models.AutoField(primary_key=True)
     address = models.CharField(max_length=50, blank=True, null=True)
     user_type = models.ForeignKey("UserType", models.DO_NOTHING, blank=True, null=True)
 
@@ -248,7 +248,7 @@ class User(models.Model):
 
 
 class UserType(models.Model):
-    iduser_type = models.IntegerField(primary_key=True)
+    iduser_type = models.AutoField(primary_key=True)
     user_type = models.CharField(max_length=10, blank=True, null=True)
     priv = models.ForeignKey(Privs, models.DO_NOTHING, blank=True, null=True)
 

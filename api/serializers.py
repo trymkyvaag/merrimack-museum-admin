@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api.models import Artwork, Artist, Donor, Location, Category
+from api.models import Artwork, Artist, Donor, Location, Category, User, UserType
 
 
 # Artist table, pk auto generated
@@ -29,6 +29,27 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ["category"]
+
+
+# Category table, pk auto generated
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["address"]
+
+    def create(self, validated_data):
+        address = validated_data.get("address")
+        # Check if the user already exists with the given email address
+        existing_user = User.objects.filter(address=address).first()
+
+        if not existing_user:
+            # Get or create the UserType instance with a user_type of "3"
+            user_type, created = UserType.objects.get_or_create(user_type="student")
+            validated_data["user_type"] = user_type
+            user = User.objects.create(**validated_data)
+            return user
+        else:
+            return existing_user
 
 
 # Artwork table, handles attributes and foreign keys
