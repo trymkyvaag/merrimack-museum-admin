@@ -1,10 +1,8 @@
 from django.shortcuts import render
-from .serializers import ArtworkSerializer, ArtworkSearchSerializer
+from .serializers import ArtworkSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Artwork
-from django.db.models import Q
 
 
 # Create your views here.
@@ -19,14 +17,20 @@ class CreateArtworkView(APIView):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()  # This will call the custom create() method in ArtworkSerializer
+            serializer.save() # This will call the custom create() method in ArtworkSerializer
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ArtworkSearchView(APIView):
-    def get(self, request):
-        serializer = ArtworkSearchSerializer(data=request.query_params)
+class EditArtworkView(APIView):
+    queryset = Artwork.objects.all()
+    serializer_class = ArtworkSerializer
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=True)
+
         if serializer.is_valid():
             location = serializer.validated_data.get('location', None)
             donor = serializer.validated_data.get('donor', None)
