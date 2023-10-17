@@ -40,7 +40,7 @@ class ArtworkSearchView(APIView):
         else:
             # Return an empty queryset if no keyword is provided.
             queryset = Artwork.objects.none()
-
+        print(f"Query Set: {queryset}")
         results = ArtworkSerializer(queryset, many=True)
 
         return Response(results.data, status=status.HTTP_200_OK)
