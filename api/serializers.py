@@ -1,6 +1,7 @@
-from rest_framework import serializers
-
-from api.models import Artwork, Artist, Donor, Location, Category, User, UserType
+from rest_framework import serializers, status
+from rest_framework.response import Response
+from rest_framework import serializers as rest_serializers
+from api.models import *
 
 
 # Artist table, pk auto generated
@@ -31,9 +32,24 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ["category"]
 
 
+class PrivsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Privs
+        fields = ["privs"]
+
+
+class UserTypeSerializer(serializers.ModelSerializer):
+    priv = PrivsSerializer(read_only=True)
+
+    class Meta:
+        model = UserType
+        fields = ["user_type", "priv"]
+
+
 # Category table, pk auto generated
 class UserSerializer(serializers.ModelSerializer):
-    user_type = serializers.ReadOnlyField()
+    user_type = UserTypeSerializer(read_only=True)
+    # priv = PrivsSerializer(read_only=True)
 
     class Meta:
         model = User
@@ -43,14 +59,41 @@ class UserSerializer(serializers.ModelSerializer):
         address = validated_data.get("address")
         # Check if the user already exists with the given email address
         existing_user = User.objects.filter(address=address).first()
-
         if not existing_user:
             # Get or create the UserType instance with a user_type of "3"
             user_type, created = UserType.objects.get_or_create(user_type="student")
             validated_data["user_type"] = user_type
             user = User.objects.create(**validated_data)
-            return user.user_type
+            return user
         else:
+            return existing_user
+
+
+# Create a new serializer for updating user information
+class UpdateUserSerializer(serializers.ModelSerializer):
+    user_type = UserTypeSerializer()
+
+    class Meta:
+        model = User
+        fields = ["address", "user_type"]
+
+    def create(self, validated_data):
+        user_type_value = validated_data.get("user_type")["user_type"]
+
+        user_type_instance = UserType.objects.filter(user_type=user_type_value).first()
+        if not user_type_instance:
+            raise rest_serializers.ValidationError(
+                f"UserType with the specified user_type '{user_type_value}' does not exist."
+            )
+
+        user_type_pk = user_type_instance.pk
+
+        address = validated_data.get("address")
+        # Check if the user already exists with the given email address
+        existing_user = User.objects.filter(address=address).first()
+        if existing_user:
+            existing_user.user_type_id = user_type_pk
+            existing_user.save()
             return existing_user
 
 
@@ -111,7 +154,7 @@ class ArtworkSerializer(serializers.ModelSerializer):
             donor=donor_instance,
             location=location_instance,
             category=category_instance,
-            **validated_data  # Include the remaining validated data
+            **validated_data,  # Include the remaining validated data
         )
 
         return artwork_instance
