@@ -29,12 +29,8 @@ class ArtworkSearchView(APIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        # IDK what to call this but for now just keyword
-        # search_json = {'keyword' : request.data.get.}
         keywords = request.data.get('keyword')
         keyword_list = keywords.split() if keywords else []
-
-        print(f"\n\n\nKeyword recieved: {keyword_list}\n\n\n")
         queryset = Artwork.objects.none()
 
         for kw in keyword_list:
@@ -48,10 +44,8 @@ class ArtworkSearchView(APIView):
                 Q(category__category__icontains=kw)
                 # Add more fields here as needed
             )
-            print(f"filter:{q_filter}")
+
             queryset |= Artwork.objects.filter(q_filter)
-            print(f"Queryset: {queryset}")
 
         results = ArtworkSerializer(queryset, many=True)
-        print(f"\n\n\nHere are some cool results: {results.data}\n\n\n")
         return Response(results.data, status=status.HTTP_200_OK)
