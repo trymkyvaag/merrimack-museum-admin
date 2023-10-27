@@ -32,9 +32,14 @@ class ArtworkSearchView(APIView):
         if keyword:
             queryset = Artwork.objects.filter(
                 Q(title__icontains=keyword) |
+                Q(artwork__comments__icontains=keyword) |
+                Q(artwork__width__icontains=keyword) |
+                Q(artwork__height__icontains=keyword) |
                 Q(location__location__icontains=keyword) |
                 Q(donor__donor_name__icontains=keyword) |
-                Q(artist__artist_name__icontains=keyword)
+                Q(category__category__icontains=keyword) |
+                Q(images__image_path__icontains=keyword) |
+                Q(location__Location__icontains=keyword)
                 # Add more fields here as needed
             )
         else:
