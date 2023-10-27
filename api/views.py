@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from api.models import Artwork
-from .serializers import ArtworkSearchInputSerializer, ArtworkSerializer
+from .serializers import ArtworkSearchInputSerializer, ArtworkSerializer, KeywordSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -25,27 +25,33 @@ class CreateArtworkView(APIView):
 
 
 class ArtworkSearchView(APIView):
+    serializer_class = ArtworkSearchInputSerializer
+
     def post(self, request):
+        serializer = self.serializer_class(data=request.data)
         # IDK what to call this but for now just keyword
-        keyword = request.data.get('keyword')
-        print(f"Keyword recieved: {keyword}")
-        if keyword:
-            queryset = Artwork.objects.filter(
-                Q(title__icontains=keyword) |
-                Q(artwork__comments__icontains=keyword) |
-                Q(artwork__width__icontains=keyword) |
-                Q(artwork__height__icontains=keyword) |
-                Q(location__location__icontains=keyword) |
-                Q(donor__donor_name__icontains=keyword) |
-                Q(category__category__icontains=keyword) |
-                Q(images__image_path__icontains=keyword) |
-                Q(location__Location__icontains=keyword)
+        # search_json = {'keyword' : request.data.get.}
+        keywords = request.data.get('keyword')
+        keyword_list = keywords.split() if keywords else []
+
+        print(f"\n\n\nKeyword recieved: {keyword_list}\n\n\n")
+        queryset = Artwork.objects.none()
+
+        for kw in keyword_list:
+            q_filter = (
+                Q(title__icontains=kw) |
+                Q(comments__icontains=kw) |
+                Q(width__icontains=kw) |
+                Q(height__icontains=kw) |
+                Q(location__location__icontains=kw) |
+                Q(donor__donor_name__icontains=kw) |
+                Q(category__category__icontains=kw)
                 # Add more fields here as needed
             )
-        else:
-            # Return an empty queryset if no keyword is provided.
-            queryset = Artwork.objects.none()
-        print(f"Query Set: {queryset}")
-        results = ArtworkSerializer(queryset, many=True)
+            print(f"filter:{q_filter}")
+            queryset |= Artwork.objects.filter(q_filter)
+            print(f"Queryset: {queryset}")
 
+        results = ArtworkSerializer(queryset, many=True)
+        print(f"\n\n\nHere are some cool results: {results.data}\n\n\n")
         return Response(results.data, status=status.HTTP_200_OK)
