@@ -1,13 +1,28 @@
 from django.urls import path
-from .views import CreateArtworkView, ArtworkSearchView
+from .views import *
 
 urlpatterns = [
     path(
         # end-point for adding new artwork to db
         "add-artwork/",
-        CreateArtworkView.as_view(),
+        AddArtwork.as_view(),
+    ),
+    path(
+        # end-point for adding user to db
+        "add-or-check-user/",
+        AddOrCheckUser.as_view(),
+    ),
+    path(
+        # end-point for adding user to db
+        "current-user-privs/",
+        CurrentUserPrivs.as_view(),
     ),
 
+    path(
+        # end-point for adding user to db
+        "edit-user-privs/",
+        UpdateUser.as_view(),
+    ),
     path(
         # end-point for searching for artwork
         "searchartwork/",
