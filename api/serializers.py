@@ -122,11 +122,6 @@ class ArtworkSerializer(serializers.ModelSerializer):
 
 class KeywordSerializer(serializers.Serializer):
     keyword = serializers.CharField(required=True)
-# class ArtworkSearchSerializer(serializers.Serializer):
-#     location = serializers.CharField(required=False)
-#     donor = serializers.CharField(required=False)
-#     name = serializers.CharField(required=False)
-#     artist_name = serializers.CharField(required=False)
 
 
 class ArtworkSearchInputSerializer(serializers.Serializer):
