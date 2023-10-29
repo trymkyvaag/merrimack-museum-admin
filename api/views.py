@@ -13,13 +13,13 @@ from django.db.models import Q
 # Responsible for adding an artwork to the database
 # Use case: Admin -> ADD
 class AddArtwork(APIView):
-    serializer_class = ArtworkSerializer
+    serializer_class = AddArtworkSerializer
 
     def post(self, request, format=None):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()  # This will call the custom create() method in ArtworkSerializer
+            serializer.save()  # This will call the custom create() method in AddArtworkSerializer
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -29,18 +29,18 @@ class ArtworkSearchView(APIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        keywords = request.data.get('keyword')
+        keywords = request.data.get("keyword")
         keyword_list = keywords.split() if keywords else []
         queryset = Artwork.objects.none()
         for kw in keyword_list:
             q_filter = (
-                Q(title__icontains=kw) |
-                Q(comments__icontains=kw) |
-                Q(width__icontains=kw) |
-                Q(height__icontains=kw) |
-                Q(location__location__icontains=kw) |
-                Q(donor__donor_name__icontains=kw) |
-                Q(category__category__icontains=kw)
+                Q(title__icontains=kw)
+                | Q(comments__icontains=kw)
+                | Q(width__icontains=kw)
+                | Q(height__icontains=kw)
+                | Q(location__location__icontains=kw)
+                | Q(donor__donor_name__icontains=kw)
+                | Q(category__category__icontains=kw)
                 # Add more fields here as needed
             )
             queryset |= Artwork.objects.filter(q_filter)
@@ -68,8 +68,7 @@ class AddOrCheckUser(APIView):
             if existing_user:
                 # If the user exists, return the existing user's information
                 return Response(
-                    UserSerializer(
-                        existing_user).data, status=status.HTTP_200_OK
+                    UserSerializer(existing_user).data, status=status.HTTP_200_OK
                 )
             else:
                 # If the user doesn't exist, create a new user
@@ -95,13 +94,11 @@ class CurrentUserPrivs(APIView):
             if existing_user:
                 # If the user verifies, return the existing user's current information
                 return Response(
-                    UserSerializer(
-                        existing_user).data, status=status.HTTP_200_OK
+                    UserSerializer(existing_user).data, status=status.HTTP_200_OK
                 )
             # Bad, request trying to elevate privs of a user that does not exist
             else:
-                error_message = {
-                    "error": "User with the given address does not exist."}
+                error_message = {"error": "User with the given address does not exist."}
                 return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

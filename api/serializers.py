@@ -61,8 +61,7 @@ class UserSerializer(serializers.ModelSerializer):
         existing_user = User.objects.filter(address=address).first()
         if not existing_user:
             # Get or create the UserType instance with a user_type of "3"
-            user_type, created = UserType.objects.get_or_create(
-                user_type="student")
+            user_type, created = UserType.objects.get_or_create(user_type="student")
             validated_data["user_type"] = user_type
             user = User.objects.create(**validated_data)
             return user
@@ -99,7 +98,7 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 
 
 # Artwork table, handles attributes and foreign keys
-class ArtworkSerializer(serializers.ModelSerializer):
+class AddArtworkSerializer(serializers.ModelSerializer):
     # Foreign keys, not used when creating
     # or updating model instances based on incoming data (write-only set to True)
     artist_name = serializers.CharField(write_only=True)
@@ -131,15 +130,13 @@ class ArtworkSerializer(serializers.ModelSerializer):
         category_name = validated_data.pop("category")
 
         # Get or create an Artist instance based on artist_name
-        artist_instance, created = Artist.objects.get_or_create(
-            artist_name=artist_name)
+        artist_instance, created = Artist.objects.get_or_create(artist_name=artist_name)
 
         donor_instance = None
         # Check if donor_name exists
         if donor_name:
             # Get or create a Donor instance based on donor_name
-            donor_instance, created = Donor.objects.get_or_create(
-                donor_name=donor_name)
+            donor_instance, created = Donor.objects.get_or_create(donor_name=donor_name)
 
         # Get or create a Location instance based on location_name
         location_instance, created = Location.objects.get_or_create(
@@ -169,3 +166,16 @@ class KeywordSerializer(serializers.Serializer):
 
 class ArtworkSearchInputSerializer(serializers.Serializer):
     keyword = serializers.CharField()
+
+
+# Artwork table return all fields
+class ArtworkSerializer(serializers.ModelSerializer):
+    artist = ArtistSerializer()
+    donor = DonorSerializer()
+    location = LocationSerializer()
+    category = CategorySerializer()
+
+    class Meta:
+        model = Artwork
+        # Fields to include when serializing or deserializing
+        fields = "__all__"
