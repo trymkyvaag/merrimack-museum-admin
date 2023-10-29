@@ -17,9 +17,16 @@ urlpatterns = [
         "current-user-privs/",
         CurrentUserPrivs.as_view(),
     ),
+
     path(
         # end-point for adding user to db
         "edit-user-privs/",
         UpdateUser.as_view(),
+    ),
+    path(
+        # end-point for searching for artwork
+        "searchartwork/",
+        ArtworkSearchView.as_view(),
+
     ),
 ]
