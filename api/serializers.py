@@ -59,14 +59,10 @@ class UserSerializer(serializers.ModelSerializer):
 class ArtworkSerializer(serializers.ModelSerializer):
     # Foreign keys, not used when creating
     # or updating model instances based on incoming data (write-only set to True)
-    artist_name = serializers.CharField(
-        source='artist.artist_name', read_only=True)
-    donor_name = serializers.CharField(
-        source='donor.donor_name', read_only=True)
-    location = serializers.CharField(
-        source='location.location', read_only=True)
-    category = serializers.CharField(
-        source='category.category', read_only=True)
+    artist_name = serializers.CharField(write_only=True)
+    donor_name = serializers.CharField(write_only=True, required=False)
+    location = serializers.CharField(write_only=True)
+    category = serializers.CharField(write_only=True)
 
     class Meta:
         model = Artwork
