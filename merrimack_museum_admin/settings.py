@@ -87,6 +87,14 @@ DATABASES = {
         "PORT": 3306,
         "HOST": "127.0.0.1",
     },
+    "test": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "test_dit1",
+        "USER": "root",
+        "PASSWORD": "Myrt2001?",
+        "PORT": 3306,
+        "HOST": "127.0.0.1",
+    }
 }
 
 
