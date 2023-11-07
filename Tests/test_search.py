@@ -8,7 +8,6 @@ from django.db.models import Q
 class SearchArtworkViewTest(TestCase):
 
     def setUp(self):
-        artist_instance = Artist.objects.create(artist_name="Sample Artist")
         image_instance = Images.objects.create(idimages=1,
                                                image_path="www.forbes.com/advisor/wp-content/uploads/2023/07/top-20-small-dog-breeds.jpg")
         image_instance2 = Images.objects.create(idimages=2,
