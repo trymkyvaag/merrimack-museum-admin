@@ -5,6 +5,8 @@ from rest_framework.test import APIClient
 from api.models import Artist, Artwork, Donor, Images, Location, Category
 from api.serializers import ArtworkSerializer
 
+print("Running addition test")
+
 
 class CreateArtworkViewTest(TestCase):
 
