@@ -19,21 +19,36 @@ class CreateArtworkViewTest(TestCase):
                                                image_path="www.forbes.com/advisor/wp-content/uploads/2023/07/top-20-small-dog-breeds.jpg")
 
         # Artwork data with string values for location and category
-        artwork_data = {
+        # artwork_data = {
+        #     'title': 'Sample Artwork',
+        #     'date_created_month': 5,
+        #     'date_created_year': '2023',
+        #     'comments': 'This is a sample artwork',
+        #     'width': '20.5',  # Converted to a string
+        #     'height': '15.0',  # Converted to a string
+        #     'artist': artist_instance.artist_name,  # Use the artist's name
+        #     'donor': donor_instance.donor_name,  # Use the donor's name
+        #     'location': location_instance.location,  # Use the location's name
+        #     'category': category_instance.category,  # Use the category's name
+        #     'image_path': image_instance.image_path,
+        # }
+
+        artwork_data2 = {
             'title': 'Sample Artwork',
             'date_created_month': 5,
             'date_created_year': '2023',
             'comments': 'This is a sample artwork',
             'width': '20.5',  # Converted to a string
             'height': '15.0',  # Converted to a string
-            'artist': artist_instance.artist_name,  # Use the artist's name
-            'donor': donor_instance.donor_name,  # Use the donor's name
-            'location': location_instance.location,  # Use the location's name
-            'category': category_instance.category,  # Use the category's name
-            'image_path': image_instance.image_path,
+            'artist_name': 'Sample Artist',  # Use the artist's name
+            'donor_name': 'Sample Donor',  # Use the donor's name
+            'location': 'Sample Location',  # Use the location's name
+            'category': 'Sample Category',  # Use the category's name
+            'image_path': image_instance.idimages,  # Use the image's primary key
         }
+        print(f"artwork: {artist_instance.artist_name}")
 
-        serializer = ArtworkSerializer(data=artwork_data)
+        serializer = ArtworkSerializer(data=artwork_data2)
         print("serializer created")
 
         if serializer.is_valid():
