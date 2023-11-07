@@ -7,6 +7,10 @@ from api.serializers import ArtworkSerializer
 
 
 class CreateArtworkViewTest(TestCase):
+    # def setUp(self) -> None:
+    #     print("setup called")
+    #     return super().setUp()
+
     def test_create_artwork(self):
         data = {
             "title": "My Artwork",

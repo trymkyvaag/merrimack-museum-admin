@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "db_table": "artist",
-                "managed": False,
+                "managed": True,
             },
         ),
         migrations.CreateModel(
@@ -48,7 +48,8 @@ class Migration(migrations.Migration):
                 ("comments", models.CharField(blank=True, max_length=255, null=True)),
                 (
                     "width",
-                    models.DecimalField(blank=True, decimal_places=3, max_digits=10),
+                    models.DecimalField(
+                        blank=True, decimal_places=3, max_digits=10),
                 ),
                 (
                     "height",
@@ -59,7 +60,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "db_table": "artwork",
-                "managed": False,
+                "managed": True,
             },
         ),
         migrations.CreateModel(
@@ -172,7 +173,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "db_table": "category",
-                "managed": False,
+                "managed": True,
             },
         ),
         migrations.CreateModel(
@@ -236,7 +237,8 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "session_key",
-                    models.CharField(max_length=40, primary_key=True, serialize=False),
+                    models.CharField(
+                        max_length=40, primary_key=True, serialize=False),
                 ),
                 ("session_data", models.TextField()),
                 ("expire_date", models.DateTimeField()),
@@ -255,18 +257,21 @@ class Migration(migrations.Migration):
                         db_column="idDonor", primary_key=True, serialize=False
                     ),
                 ),
-                ("donor_name", models.CharField(blank=True, max_length=30, null=True)),
+                ("donor_name", models.CharField(
+                    blank=True, max_length=30, null=True)),
             ],
             options={
                 "db_table": "donor",
-                "managed": False,
+                "managed": True,
             },
         ),
         migrations.CreateModel(
             name="Images",
             fields=[
-                ("idimages", models.IntegerField(primary_key=True, serialize=False)),
-                ("image_path", models.CharField(blank=True, max_length=100, null=True)),
+                ("idimages", models.IntegerField(
+                    primary_key=True, serialize=False)),
+                ("image_path", models.CharField(
+                    blank=True, max_length=100, null=True)),
             ],
             options={
                 "db_table": "images",
@@ -291,7 +296,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "db_table": "location",
-                "managed": False,
+                "managed": True,
             },
         ),
         migrations.CreateModel(
@@ -301,11 +306,12 @@ class Migration(migrations.Migration):
                     "idmove_request",
                     models.IntegerField(primary_key=True, serialize=False),
                 ),
-                ("to_location", models.CharField(blank=True, max_length=30, null=True)),
+                ("to_location", models.CharField(
+                    blank=True, max_length=30, null=True)),
             ],
             options={
                 "db_table": "move_request",
-                "managed": False,
+                "managed": True,
             },
         ),
         migrations.CreateModel(
@@ -316,7 +322,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "db_table": "privs",
-                "managed": False,
+                "managed": True,
             },
         ),
         migrations.CreateModel(
@@ -333,7 +339,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "db_table": "request_type",
-                "managed": False,
+                "managed": True,
             },
         ),
         migrations.CreateModel(
@@ -344,18 +350,19 @@ class Migration(migrations.Migration):
             ],
             options={
                 "db_table": "user",
-                "managed": False,
+                "managed": True,
             },
         ),
         migrations.CreateModel(
             name="UserType",
             fields=[
-                ("iduser_type", models.IntegerField(primary_key=True, serialize=False)),
+                ("iduser_type", models.IntegerField(
+                    primary_key=True, serialize=False)),
                 ("user_type", models.CharField(blank=True, max_length=10, null=True)),
             ],
             options={
                 "db_table": "user_type",
-                "managed": False,
+                "managed": True,
             },
         ),
     ]
