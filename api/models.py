@@ -31,16 +31,22 @@ class Artwork(models.Model):
         blank=True, null=True
     )  # This field type is a guess.
     comments = models.CharField(max_length=255, blank=True, null=True)
-    width = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
-    height = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
-    artist = models.ForeignKey(Artist, models.DO_NOTHING, blank=True, null=True)
-    donor = models.ForeignKey("Donor", models.DO_NOTHING, blank=True, null=True)
-    location = models.ForeignKey("Location", models.DO_NOTHING, blank=True, null=True)
-    category = models.ForeignKey("Category", models.DO_NOTHING, blank=True, null=True)
-    image_path = models.ForeignKey("Images", models.DO_NOTHING, blank=True, null=True)
+    width = models.DecimalField(
+        max_digits=10, decimal_places=3, blank=True, null=True)
+    height = models.DecimalField(
+        max_digits=10, decimal_places=3, blank=True, null=True)
+    artist = models.ForeignKey(Artist, models.CASCADE, blank=True, null=True)
+    donor = models.ForeignKey(
+        "Donor", models.CASCADE, blank=True, null=True)
+    location = models.ForeignKey(
+        "Location", models.CASCADE, blank=True, null=True)
+    category = models.ForeignKey(
+        "Category", models.CASCADE, blank=True, null=True)
+    image_path = models.ForeignKey(
+        "Images", models.CASCADE, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "artwork"
 
 
@@ -206,8 +212,10 @@ class Location(models.Model):
 
 class MoveRequest(models.Model):
     idmove_request = models.IntegerField(primary_key=True)
-    artwork = models.ForeignKey(Artwork, models.DO_NOTHING, blank=True, null=True)
-    location = models.ForeignKey(Location, models.DO_NOTHING, blank=True, null=True)
+    artwork = models.ForeignKey(
+        Artwork, models.DO_NOTHING, blank=True, null=True)
+    location = models.ForeignKey(
+        Location, models.DO_NOTHING, blank=True, null=True)
     to_location = models.CharField(max_length=30, blank=True, null=True)
     request_type = models.ForeignKey(
         "RequestType", models.DO_NOTHING, blank=True, null=True
@@ -240,7 +248,8 @@ class RequestType(models.Model):
 class User(models.Model):
     iduser = models.IntegerField(primary_key=True)
     address = models.CharField(max_length=50, blank=True, null=True)
-    user_type = models.ForeignKey("UserType", models.DO_NOTHING, blank=True, null=True)
+    user_type = models.ForeignKey(
+        "UserType", models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
