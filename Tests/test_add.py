@@ -46,38 +46,24 @@ class CreateArtworkViewTest(TestCase):
             self.fail("Serializer is not valid")
 
         print("serializers saved")
-        # artwork = Artwork.objects.create(
-        #     title=serializer.validated_data['title'],
-        #     date_created_month=serializer.validated_data['date_created_month'],
-        #     date_created_year=serializer.validated_data['date_created_year'],
-        #     comments=serializer.validated_data['comments'],
-        #     width=serializer.validated_data['width'],
-        #     height=serializer.validated_data['height'],
-        #     artist=artist_instance,
-        #     donor=donor_instance,
-        #     location=location_instance,
-        #     category=category_instance,
-        #     image_path=image_instance
-        # )
         artwork = Artwork.objects.get(title='Sample Artwork')
         print("running tests")
 
         self.assertEqual(artwork.title, "Sample Artwork")
         self.assertEqual(artwork.date_created_month, 5)
-        # # Add more assertions for other fields
         artworks_in_db = Artwork.objects.filter(title='Sample Artwork')
         print(artworks_in_db)
-        # Should be exactly one artwork
         self.assertEqual(artworks_in_db.count(), 1)
-
-        # Retrieve the artwork from the database and check its attributes
+        
         artwork_from_db = artworks_in_db.first()
         self.assertEqual(artwork_from_db.title, 'Sample Artwork')
         self.assertEqual(artwork_from_db.date_created_month, 5)
-        # Add more assertions for other fields
+
 
         # Clean up after the test
         artwork.delete()
+
+
 
     def tearDown(self):
         # Clean up the test database
