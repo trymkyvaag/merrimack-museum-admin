@@ -61,7 +61,8 @@ class CreateArtworkViewTest(TestCase):
         print("serializers saved")
 
         # Add assertions to check if the object is created as expected
-        # artwork = Artwork.objects.create(**data)  # get(title="My Artwork")
+        artwork = Artwork.objects.create(
+            **artwork_data2)  # get(title="My Artwork")
         print("running tests")
 
         # self.assertEqual(artwork.title, "My Artwork")
