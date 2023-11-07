@@ -7,11 +7,9 @@ from api.serializers import ArtworkSerializer
 
 
 class CreateArtworkViewTest(TestCase):
-    # def setUp(self) -> None:
-    #     print("setup called")
-    #     return super().setUp()
 
     def test_create_artwork(self):
+        print("Setup is good")
         data = {
             "title": "My Artwork",
             "date_created_month": 10,
@@ -24,18 +22,28 @@ class CreateArtworkViewTest(TestCase):
             "location": "Art Gallery",  # Example location
             "category": "Painting",  # Example category
         }
-
+        print("data created")
+        print("creating serializer")
         serializer = ArtworkSerializer(data=data)
+        print("serializer created")
+
         if serializer.is_valid():
+            print("Serializer is valid")
             serializer.save()
         else:
             self.fail("Serializer is not valid")
 
+        print("serializers saved")
+
         # Add assertions to check if the object is created as expected
         artwork = Artwork.objects.get(title="My Artwork")
+        print("running tests")
+
         self.assertEqual(artwork.title, "My Artwork")
         self.assertEqual(artwork.date_created_month, 10)
         # Add more assertions for other fields
 
         # Clean up after the test
         artwork.delete()
+
+
