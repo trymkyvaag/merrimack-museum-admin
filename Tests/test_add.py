@@ -18,33 +18,18 @@ class CreateArtworkViewTest(TestCase):
         image_instance = Images.objects.create(idimages=1,
                                                image_path="www.forbes.com/advisor/wp-content/uploads/2023/07/top-20-small-dog-breeds.jpg")
 
-        # Artwork data with string values for location and category
-        # artwork_data = {
-        #     'title': 'Sample Artwork',
-        #     'date_created_month': 5,
-        #     'date_created_year': '2023',
-        #     'comments': 'This is a sample artwork',
-        #     'width': '20.5',  # Converted to a string
-        #     'height': '15.0',  # Converted to a string
-        #     'artist': artist_instance.artist_name,  # Use the artist's name
-        #     'donor': donor_instance.donor_name,  # Use the donor's name
-        #     'location': location_instance.location,  # Use the location's name
-        #     'category': category_instance.category,  # Use the category's name
-        #     'image_path': image_instance.image_path,
-        # }
-
         artwork_data2 = {
             'title': 'Sample Artwork',
             'date_created_month': 5,
             'date_created_year': '2023',
             'comments': 'This is a sample artwork',
-            'width': '20.5',  # Converted to a string
-            'height': '15.0',  # Converted to a string
-            'artist_name': 'Sample Artist',  # Use the artist's name
-            'donor_name': 'Sample Donor',  # Use the donor's name
-            'location': 'Sample Location',  # Use the location's name
-            'category': 'Sample Category',  # Use the category's name
-            'image_path': image_instance.idimages,  # Use the image's primary key
+            'width': '20.5',
+            'height': '15.0',
+            'artist_name': 'Sample Artist',
+            'donor_name': 'Sample Donor',
+            'location': 'Sample Location',
+            'category': 'Sample Category',
+            'image_path': image_instance.image_path,
         }
         print(f"artwork: {artist_instance.artist_name}")
 
@@ -59,15 +44,24 @@ class CreateArtworkViewTest(TestCase):
             self.fail("Serializer is not valid")
 
         print("serializers saved")
-
-        # Add assertions to check if the object is created as expected
         artwork = Artwork.objects.create(
-            **artwork_data2)  # get(title="My Artwork")
+            title=serializer.validated_data['title'],
+            date_created_month=serializer.validated_data['date_created_month'],
+            date_created_year=serializer.validated_data['date_created_year'],
+            comments=serializer.validated_data['comments'],
+            width=serializer.validated_data['width'],
+            height=serializer.validated_data['height'],
+            artist=artist_instance,
+            donor=donor_instance,
+            location=location_instance,
+            category=category_instance,
+            image_path=image_instance
+        )
         print("running tests")
 
-        # self.assertEqual(artwork.title, "My Artwork")
-        # self.assertEqual(artwork.date_created_month, 10)
+        self.assertEqual(artwork.title, "Sample Artwork")
+        self.assertEqual(artwork.date_created_month, 5)
         # # Add more assertions for other fields
 
-        # # Clean up after the test
-        # artwork.delete()
+        # Clean up after the test
+        artwork.delete()
