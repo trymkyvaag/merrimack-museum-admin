@@ -116,3 +116,23 @@ class UpdateUser(APIView):
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RandomArtworkView(APIView):
+    serializer_class = RandomArtworkSerializer
+
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            num_artworks = serializer.validated_data["num_artworks"]
+            queryset = Artwork.objects.all()
+
+            if num_artworks > queryset.count():
+                num_artworks = queryset.count()
+
+            random_artworks = random.sample(list(queryset), num_artworks)
+            artwork_serializer = ArtworkSerializer(random_artworks, many=True)
+            return Response(artwork_serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

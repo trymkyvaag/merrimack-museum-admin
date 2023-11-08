@@ -2,6 +2,7 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework import serializers as rest_serializers
 from api.models import *
+import random
 
 
 # Artist table, pk auto generated
@@ -36,6 +37,12 @@ class PrivsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Privs
         fields = ["privs"]
+
+
+class ImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Images
+        fields = ["image_path"]
 
 
 class UserTypeSerializer(serializers.ModelSerializer):
@@ -105,6 +112,7 @@ class AddArtworkSerializer(serializers.ModelSerializer):
     donor_name = serializers.CharField(write_only=True, required=False)
     location = serializers.CharField(write_only=True)
     category = serializers.CharField(write_only=True)
+    image_path = serializers.CharField(write_only=True)
 
     class Meta:
         model = Artwork
@@ -120,6 +128,7 @@ class AddArtworkSerializer(serializers.ModelSerializer):
             "donor_name",
             "location",
             "category",
+            "image_path",
         )
 
     def create(self, validated_data):
@@ -128,7 +137,7 @@ class AddArtworkSerializer(serializers.ModelSerializer):
         donor_name = validated_data.pop("donor_name", None)
         location_name = validated_data.pop("location")
         category_name = validated_data.pop("category")
-
+        img_path_name = validated_data.pop("image_path")
         # Get or create an Artist instance based on artist_name
         artist_instance, created = Artist.objects.get_or_create(artist_name=artist_name)
 
@@ -148,12 +157,17 @@ class AddArtworkSerializer(serializers.ModelSerializer):
             category=category_name
         )
 
+        image_path_instance, created = Images.objects.get_or_create(
+            image_path=img_path_name
+        )
+
         # Create an Artwork instance, associating it with the Artist, Donor, Location, and Category instances
         artwork_instance = Artwork.objects.create(
             artist=artist_instance,
             donor=donor_instance,
             location=location_instance,
             category=category_instance,
+            image_path=image_path_instance,
             **validated_data,  # Include the remaining validated data
         )
 
@@ -174,8 +188,36 @@ class ArtworkSerializer(serializers.ModelSerializer):
     donor = DonorSerializer()
     location = LocationSerializer()
     category = CategorySerializer()
+    image_path = ImagesSerializer()
 
     class Meta:
         model = Artwork
         # Fields to include when serializing or deserializing
         fields = "__all__"
+
+
+class ArtworkSerializerStandard(serializers.ModelSerializer):
+    class Meta:
+        model = Artwork
+        fields = "__all__"
+
+
+class RandomArtworkSerializer(serializers.Serializer):
+    num_artworks = serializers.IntegerField()
+    print("The num of artworks", num_artworks)
+
+    def to_representation(self, instance):
+        num_artworks = self.validated_data["num_artworks"]
+        queryset = Artwork.objects.all()
+        total_artworks = queryset.count()
+
+        # Ensure num_artworks does not exceed the total number of artworks
+        num_artworks = min(num_artworks, total_artworks)
+
+        # Get a random set of num_artworks from the queryset
+        random_artworks = random.sample(list(queryset), num_artworks)
+
+        # Serialize the random artworks using the ArtworkSerializer
+        artwork_data = ArtworkSerializerStandard(random_artworks, many=True).data
+
+        return {"random_artworks": artwork_data}
