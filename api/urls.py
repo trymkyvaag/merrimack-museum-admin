@@ -1,5 +1,9 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from .views import *
+
+router = DefaultRouter()
+router.register(r'move-requests', MoveRequestViewSet, basename='move-request')
 
 urlpatterns = [
     path(
@@ -32,4 +36,5 @@ urlpatterns = [
         "randomartwork/",
         RandomArtworkView.as_view(),
     ),
+    path('', include(router.urls)),
 ]
