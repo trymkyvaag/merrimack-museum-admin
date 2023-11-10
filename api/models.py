@@ -212,6 +212,9 @@ class MoveRequest(models.Model):
     request_type = models.ForeignKey(
         "RequestType", models.DO_NOTHING, blank=True, null=True
     )
+    is_pending = models.IntegerField()
+    is_approved = models.IntegerField()
+    comments = models.CharField(max_length=200, blank=True, null=True)
 
     class Meta:
         managed = False
