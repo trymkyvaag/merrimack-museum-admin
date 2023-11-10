@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .serializers import *
-from rest_framework.views import APIView
+from rest_framework.views import APIView, viewsets
 from rest_framework.response import Response
 from rest_framework import status
 from .models import *
@@ -136,3 +136,68 @@ class RandomArtworkView(APIView):
             return Response(artwork_serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MoveRequestViewSet(viewsets.ModelViewSet):
+    queryset = MoveRequest.objects.all()
+    serializer_class = MoveRequestSerializer
+    lookup_field = 'email'  # Assuming you want to use email as the lookup field
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = MoveRequestSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = MoveRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, pk=None):
+        try:
+            move_request = MoveRequest.objects.get(pk=pk)
+        except MoveRequest.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = MoveRequestSerializer(move_request)
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        try:
+            move_request = MoveRequest.objects.get(pk=pk)
+        except MoveRequest.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = MoveRequestSerializer(move_request, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, pk=None):
+        try:
+            move_request = MoveRequest.objects.get(pk=pk)
+        except MoveRequest.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = MoveRequestSerializer(
+            move_request, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, pk=None):
+        try:
+            move_request = MoveRequest.objects.get(pk=pk)
+        except MoveRequest.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        MoveRequest.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def get_queryset(self):
+        email = self.kwargs['email']
+        return MoveRequest.objects.filter(artwork__artist__email=email)
