@@ -221,3 +221,8 @@ class RandomArtworkSerializer(serializers.Serializer):
         artwork_data = ArtworkSerializerStandard(random_artworks, many=True).data
 
         return {"random_artworks": artwork_data}
+
+class MoveRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MoveRequest
+        fields = '__all__'
