@@ -5,7 +5,7 @@ from api.serializers import ArtworkSerializer
 
 print("Running addition test")
 
-
+#Test class
 class CreateArtworkViewTest(TestCase):
 
     def test_create_artwork(self):
@@ -41,7 +41,6 @@ class CreateArtworkViewTest(TestCase):
             self.fail("Serializer is not valid")
 
         print("serializers saved")
-
         artwork = Artwork.objects.get(title='Sample Artwork')
         print("running tests")
 
@@ -50,10 +49,16 @@ class CreateArtworkViewTest(TestCase):
         artworks_in_db = Artwork.objects.filter(title='Sample Artwork')
         print(artworks_in_db)
         self.assertEqual(artworks_in_db.count(), 1)
+        
         artwork_from_db = artworks_in_db.first()
         self.assertEqual(artwork_from_db.title, 'Sample Artwork')
         self.assertEqual(artwork_from_db.date_created_month, 5)
+
+
+        # Clean up after the test
         artwork.delete()
+
+
 
     def tearDown(self):
         # Clean up the test database
