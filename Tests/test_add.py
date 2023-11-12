@@ -3,19 +3,40 @@ from django.test import TestCase
 from api.models import Artist, Artwork, Donor, Images, Location, Category
 from api.serializers import ArtworkSerializer
 
-print("Running addition test")
 
-#Test class
 class CreateArtworkViewTest(TestCase):
+    """
+    Test  class for adding an artwork
+
+    ...
+
+    Attributes
+    ----------
+    _
+
+    Methods
+    -------
+    test_create_artwork()
+        tests that addiing to the database is working as intended
+
+    tearDown()
+        cleans the test_dit1 (Testing db) 
+    """
 
     def test_create_artwork(self):
-        print("Setup is good")
+        """
+        Test adding to the test database and ensure the artwork object is correctly made
 
-        artist_instance = Artist.objects.create(artist_name="Sample Artist")
+        Parameters
+        ----------
+        -
+        """
+
+        # Create image objects to correctly mock an artwork entry
         image_instance = Images.objects.create(idimages=1,
                                                image_path="www.forbes.com/advisor/wp-content/uploads/2023/07/top-20-small-dog-breeds.jpg")
 
-        artwork_data2 = {
+        artwork_data = {
             'title': 'Sample Artwork',
             'date_created_month': 5,
             'date_created_year': '2023',
@@ -28,11 +49,11 @@ class CreateArtworkViewTest(TestCase):
             'category': 'Sample Category',
             'image_path': image_instance.image_path,
         }
-        print(f"artwork: {artist_instance.artist_name}")
 
-        serializer = ArtworkSerializer(data=artwork_data2)
-        print("serializer created")
+        # Using the serializer for adding to the mock db
+        serializer = ArtworkSerializer(data=artwork_data)
 
+        # Check serializer is created correctly and that all fields are valid
         if serializer.is_valid():
             print("Serializer is valid")
             serializer.save()
@@ -40,29 +61,33 @@ class CreateArtworkViewTest(TestCase):
             print(serializer.errors)
             self.fail("Serializer is not valid")
 
-        print("serializers saved")
+        # Get the artwork from the db
         artwork = Artwork.objects.get(title='Sample Artwork')
-        print("running tests")
 
+        # Assert fields match types
         self.assertEqual(artwork.title, "Sample Artwork")
         self.assertEqual(artwork.date_created_month, 5)
+
+        # Check we have one entry with given title added and that it is only one
         artworks_in_db = Artwork.objects.filter(title='Sample Artwork')
-        print(artworks_in_db)
         self.assertEqual(artworks_in_db.count(), 1)
-        
+
+        # Another check that the first entry is the only entry and equal
         artwork_from_db = artworks_in_db.first()
         self.assertEqual(artwork_from_db.title, 'Sample Artwork')
         self.assertEqual(artwork_from_db.date_created_month, 5)
 
-
-        # Clean up after the test
+        # Delete the artwork
         artwork.delete()
 
-
-
     def tearDown(self):
-        # Clean up the test database
-        print("Tear down")
+        """
+        Tear down all objects to clean up for next test
+
+        Parameters
+        ----------
+        -
+        """
         Artwork.objects.all().delete()
         Artist.objects.all().delete()
         Donor.objects.all().delete()
