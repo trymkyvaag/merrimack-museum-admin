@@ -6,6 +6,26 @@ from django.db.models import Q
 
 
 class SearchArtworkViewTest(TestCase):
+    """
+    Test  class for searching artwork
+
+    ...
+
+    Attributes
+    ----------
+    _
+
+    Methods
+    -------
+    setUp()
+        Set up two artwork objects via valid serializers
+    test_create_artwork()
+        Uses the search view to test only return one artwork
+    tearDown()
+        Cleans up all objects  
+
+
+    """
 
     def setUp(self):
         image_instance = Images.objects.create(idimages=1,
