@@ -28,6 +28,15 @@ class SearchArtworkViewTest(TestCase):
     """
 
     def setUp(self):
+        """
+        Setup two image objects and add to test database
+
+        Parameters
+        ----------
+        -
+        """
+
+        # Create two Image objects
         image_instance = Images.objects.create(idimages=1,
                                                image_path="www.forbes.com/advisor/wp-content/uploads/2023/07/top-20-small-dog-breeds.jpg")
         image_instance2 = Images.objects.create(idimages=2,
@@ -73,9 +82,16 @@ class SearchArtworkViewTest(TestCase):
         else:
             self.fail("Serializer2 is not valid")
 
-    # AFTER MERGE MAKE THIS A FUNCTION IN VIEWS
+    # TODO: AFTER MERGE MAKE THIS A FUNCTION IN VIEWS
     def test_create_artwork(self):
-        print("Setup is good")
+        """
+        Setup two image objects and add to test database
+
+        Parameters
+        ----------
+        -
+        """
+
         keyword_list = ["Sample"]
         queryset = Artwork.objects.none()
         for kw in keyword_list:
@@ -96,8 +112,14 @@ class SearchArtworkViewTest(TestCase):
         self.assertEquals(len(results.data), 1)
 
     def tearDown(self):
+        """
+        Tear down all objects
+
+        Parameters
+        ----------
+        -
+        """
         # Clean up the test database
-        print("Tear down")
         Artwork.objects.all().delete()
         Artist.objects.all().delete()
         Donor.objects.all().delete()
