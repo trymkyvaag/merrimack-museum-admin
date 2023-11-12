@@ -2,3 +2,8 @@
 /venv
 .vscode/*
 
+#Exclude all caches from the 
+Tests/__pycache__
+api/__pycache__
+api/migrations/__pycache__
+merrimack_museum_admin/__pycache__
