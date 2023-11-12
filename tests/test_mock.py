@@ -20,9 +20,23 @@ class TryTesting(TestCase):
     """
 
     def test_always_passes(self):
+        """
+        Test that will always pass
+
+        Parameters
+        ----------
+        -
+        """
         self.assertTrue(True)
 
     def test_addition(self):
+        """
+        Test that will always pass
+
+        Parameters
+        ----------
+        -
+        """
         a = 1
         b = 1
         self.assertEqual(a, b)
