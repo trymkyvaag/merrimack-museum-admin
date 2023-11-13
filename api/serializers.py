@@ -68,7 +68,8 @@ class UserSerializer(serializers.ModelSerializer):
         existing_user = User.objects.filter(address=address).first()
         if not existing_user:
             # Get or create the UserType instance with a user_type of "3"
-            user_type, created = UserType.objects.get_or_create(user_type="student")
+            user_type, created = UserType.objects.get_or_create(
+                user_type="student")
             validated_data["user_type"] = user_type
             user = User.objects.create(**validated_data)
             return user
@@ -87,7 +88,8 @@ class UpdateUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_type_value = validated_data.get("user_type")["user_type"]
 
-        user_type_instance = UserType.objects.filter(user_type=user_type_value).first()
+        user_type_instance = UserType.objects.filter(
+            user_type=user_type_value).first()
         if not user_type_instance:
             raise rest_serializers.ValidationError(
                 f"UserType with the specified user_type '{user_type_value}' does not exist."
@@ -139,13 +141,15 @@ class AddArtworkSerializer(serializers.ModelSerializer):
         category_name = validated_data.pop("category")
         img_path_name = validated_data.pop("image_path")
         # Get or create an Artist instance based on artist_name
-        artist_instance, created = Artist.objects.get_or_create(artist_name=artist_name)
+        artist_instance, created = Artist.objects.get_or_create(
+            artist_name=artist_name)
 
         donor_instance = None
         # Check if donor_name exists
         if donor_name:
             # Get or create a Donor instance based on donor_name
-            donor_instance, created = Donor.objects.get_or_create(donor_name=donor_name)
+            donor_instance, created = Donor.objects.get_or_create(
+                donor_name=donor_name)
 
         # Get or create a Location instance based on location_name
         location_instance, created = Location.objects.get_or_create(
@@ -179,6 +183,17 @@ class KeywordSerializer(serializers.Serializer):
 
 
 class ArtworkSearchInputSerializer(serializers.Serializer):
+    """
+    A serializer for keyword search
+
+    ...
+
+    Attributes
+    ----------
+    keyword : str
+        keywords retrieved from frontend 
+
+    """
     keyword = serializers.CharField()
 
 
@@ -218,6 +233,7 @@ class RandomArtworkSerializer(serializers.Serializer):
         random_artworks = random.sample(list(queryset), num_artworks)
 
         # Serialize the random artworks using the ArtworkSerializer
-        artwork_data = ArtworkSerializerStandard(random_artworks, many=True).data
+        artwork_data = ArtworkSerializerStandard(
+            random_artworks, many=True).data
 
         return {"random_artworks": artwork_data}
