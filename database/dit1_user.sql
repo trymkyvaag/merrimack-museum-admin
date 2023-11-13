@@ -29,7 +29,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`iduser`),
   KEY `FK_User_UserType_idx` (`user_type_id`),
   CONSTRAINT `FK_User_UserType` FOREIGN KEY (`user_type_id`) REFERENCES `user_type` (`iduser_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -38,7 +38,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'casem@merrimack.edu',2),(2,'kyvagt@merrimack.edu',1),(3,'mwauram@merrimack.edu',1),(4,'suser',1),(5,'FS@merrimack.edu',2),(53,'casemNEW@merrimack.edu',3),(54,'testNull@gmail.com',3),(55,'casefwesfwe4vw',3),(56,'mark.case102@gmail.com',1);
+INSERT INTO `user` VALUES (1,'casem@merrimack.edu',2),(2,'kyvagt@merrimack.edu',1),(3,'mwauram@merrimack.edu',1),(4,'suser',1),(5,'FS@merrimack.edu',2),(53,'casemNEW@merrimack.edu',3),(54,'testNull@gmail.com',3),(55,'casefwesfwe4vw',3),(56,'mark.case102@gmail.com',1),(57,'xascresw@csd',NULL),(58,'xascresw@csd',NULL);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -51,4 +51,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-10 12:53:09
+-- Dump completed on 2023-11-13 18:48:02
