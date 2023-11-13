@@ -221,3 +221,44 @@ class RandomArtworkSerializer(serializers.Serializer):
         artwork_data = ArtworkSerializerStandard(random_artworks, many=True).data
 
         return {"random_artworks": artwork_data}
+
+
+class MoveRequestSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = MoveRequest
+        fields = "__all__"
+
+    def create(self, validated_data):
+        # Extract user data from the validated data
+        user_data = validated_data.pop("user", None)
+        # Try to get an existing user based on the provided data
+        user_instance = User.objects.filter(**user_data).first()
+
+        # If the user doesn't exist or the type of request isn't recognized
+        if not user_instance:
+            raise rest_serializers.ValidationError(
+                f"The specified values either do not exist or are unexpected."
+            )
+
+        # Create RequestType instance with the linked User instance
+        request_type_instance = MoveRequest.objects.create(
+            user=user_instance, **validated_data
+        )
+
+        return request_type_instance
+
+
+class ReturnMoveRequestsSerializer(serializers.Serializer):
+    address = serializers.CharField()
+
+    def to_representation(self, instance):
+        address = self.validated_data["address"]
+
+        # Use double underscores to traverse the foreign key relationship
+        queryset = MoveRequest.objects.filter(user__address__iexact=address)
+
+        # Now you can serialize the queryset and return the data
+        serialized_data = MoveRequestSerializer(queryset, many=True).data
+        return {"move_requests": serialized_data}

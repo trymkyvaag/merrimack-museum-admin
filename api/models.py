@@ -207,14 +207,11 @@ class Location(models.Model):
 class MoveRequest(models.Model):
     idmove_request = models.AutoField(primary_key=True)
     artwork = models.ForeignKey(Artwork, models.DO_NOTHING, blank=True, null=True)
-    location = models.ForeignKey(Location, models.DO_NOTHING, blank=True, null=True)
     to_location = models.CharField(max_length=30, blank=True, null=True)
-    request_type = models.ForeignKey(
-        "RequestType", models.DO_NOTHING, blank=True, null=True
-    )
     is_pending = models.IntegerField()
     is_approved = models.IntegerField()
     comments = models.CharField(max_length=200, blank=True, null=True)
+    user = models.ForeignKey("User", models.DO_NOTHING)
 
     class Meta:
         managed = False
@@ -228,16 +225,6 @@ class Privs(models.Model):
     class Meta:
         managed = False
         db_table = "privs"
-
-
-class RequestType(models.Model):
-    idrequest_type = models.AutoField(primary_key=True)
-    request_type = models.CharField(max_length=20, blank=True, null=True)
-    user = models.ForeignKey("User", models.DO_NOTHING, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = "request_type"
 
 
 class User(models.Model):

@@ -110,7 +110,7 @@ class UpdateUser(APIView):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            user = serializer.save()
+            serializer.save()
             return Response(
                 {"message": "User updated/created successfully"},
                 status=status.HTTP_201_CREATED,
@@ -135,4 +135,30 @@ class RandomArtworkView(APIView):
             artwork_serializer = ArtworkSerializer(random_artworks, many=True)
             return Response(artwork_serializer.data, status=status.HTTP_200_OK)
 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MoveRequest(APIView):
+    serializer_class = MoveRequestSerializer
+
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "Request Type saved successfully"},
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReturnMoveRequest(APIView):
+    serializer_class = ReturnMoveRequestsSerializer
+
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
