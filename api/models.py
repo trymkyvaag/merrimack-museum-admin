@@ -102,6 +102,15 @@ class MoveRequest(models.Model):
         db_table = "move_request"
 
 
+class Privs(models.Model):
+    idprivs = models.AutoField(primary_key=True)
+    privs = models.CharField(max_length=5, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = "privs"
+
+
 class User(models.Model):
     iduser = models.AutoField(primary_key=True)
     address = models.CharField(max_length=50, blank=True, null=True)
