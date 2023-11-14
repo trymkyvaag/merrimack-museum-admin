@@ -15,11 +15,13 @@ from django.db.models import Q
 class AddArtwork(APIView):
     serializer_class = AddArtworkSerializer
 
+    # post request type
     def post(self, request, format=None):
+        # get data from serializer
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()  # This will call the custom create() method in AddArtworkSerializer
+            serializer.save()  # Save data
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -54,15 +56,16 @@ class ArtworkSearchView(APIView):
 
 # Responsible for storing a new user to the db or retrieving a current user's info
 # Use case: Login -> set header tabs and session variables correctly
-
-
 class AddOrCheckUser(APIView):
-    serializer_class = UserSerializer
+    serializer_class = UserSerializer  # serializer data we're using
 
+    # post request type
     def post(self, request, format=None):
+        # grab data from serializer
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
+            # get (email) address value
             address = serializer.validated_data["address"]
 
             # Check if a user with the given address already exists
@@ -75,7 +78,7 @@ class AddOrCheckUser(APIView):
                         existing_user).data, status=status.HTTP_200_OK
                 )
             else:
-                # If the user doesn't exist, create a new user
+                # If the user doesn't exist, save new user and return info
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -84,9 +87,11 @@ class AddOrCheckUser(APIView):
 # Responsible for returning a valid user
 # Use case: Checking that user selected from list does in fact exist in the db, else return error
 class CurrentUserPrivs(APIView):
-    serializer_class = UserSerializer
+    serializer_class = UserSerializer  # serializer data we're using
 
+    # post request type
     def post(self, request, format=None):
+        # grab data from serializer
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
@@ -109,16 +114,18 @@ class CurrentUserPrivs(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# Use case: Updates user privs, functionality is for admin use only
 class UpdateUser(APIView):
-    serializer_class = UpdateUserSerializer
+    serializer_class = UpdateUserSerializer  # serializer data we're using
 
+    # post request type
     def post(self, request, format=None):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            user = serializer.save()
+            serializer.save()  # save the data
             return Response(
-                {"message": "User updated/created successfully"},
+                {"message": "User updated successfully"},
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -141,4 +148,34 @@ class RandomArtworkView(APIView):
             artwork_serializer = ArtworkSerializer(random_artworks, many=True)
             return Response(artwork_serializer.data, status=status.HTTP_200_OK)
 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MoveRequest(APIView):
+    serializer_class = MoveRequestSerializer  # serializer data we're using
+
+    # post request type
+    def post(self, request, format=None):
+        # grab data from serializer
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()  # save data
+            return Response(
+                {"message": "Request Type saved successfully"},
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReturnMoveRequest(APIView):
+    serializer_class = ReturnMoveRequestsSerializer  # serializer data we're usin
+
+    # post request type
+    def post(self, request, format=None):
+        # grab data from serializer
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
