@@ -68,8 +68,8 @@ class ArtworkSearchView(APIView):
                 | Q(location__location__icontains=kw)
                 | Q(donor__donor_name__icontains=kw)
                 | Q(category__category__icontains=kw)
-                | Q(category__category__icontains=kw)
-                | Q(category__category__icontains=kw)
+                | Q(artist__artist_name__icontains=kw)
+                | Q(title__icontains=kw)
                 | Q(date_created_year__icontains=kw)
                 # Add more fields here as needed
             )
