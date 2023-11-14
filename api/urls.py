@@ -32,4 +32,14 @@ urlpatterns = [
         "randomartwork/",
         RandomArtworkView.as_view(),
     ),
+    path(
+        # end-point for searching for artwork
+        "move-request/",
+        MoveRequest.as_view(),
+    ),
+    path(
+        # end-point for searching for artwork
+        "find-request/",
+        ReturnMoveRequest.as_view(),
+    ),
 ]
