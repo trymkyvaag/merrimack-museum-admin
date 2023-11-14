@@ -48,7 +48,7 @@ CREATE TABLE `artwork` (
   CONSTRAINT `FK_Artworks_Location` FOREIGN KEY (`location_id`) REFERENCES `location` (`idLocation`),
   CONSTRAINT `month_range` CHECK (((`date_created_month` >= 1) and (`date_created_month` <= 12))),
   CONSTRAINT `year_range` CHECK (((`date_created_year` >= 0) and (`date_created_year` <= 2100)))
-) ENGINE=InnoDB AUTO_INCREMENT=258 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=260 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -70,4 +70,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-13 18:48:02
+-- Dump completed on 2023-11-13 21:48:18
