@@ -25,10 +25,7 @@ DROP TABLE IF EXISTS `user_type`;
 CREATE TABLE `user_type` (
   `iduser_type` int NOT NULL AUTO_INCREMENT,
   `user_type` varchar(10) DEFAULT NULL,
-  `priv_id` int DEFAULT NULL,
-  PRIMARY KEY (`iduser_type`),
-  KEY `FK_UserType_Privs_idx` (`priv_id`),
-  CONSTRAINT `FK_UserType_Privs` FOREIGN KEY (`priv_id`) REFERENCES `privs` (`idprivs`)
+  PRIMARY KEY (`iduser_type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -38,7 +35,7 @@ CREATE TABLE `user_type` (
 
 LOCK TABLES `user_type` WRITE;
 /*!40000 ALTER TABLE `user_type` DISABLE KEYS */;
-INSERT INTO `user_type` VALUES (1,'admin',1),(2,'FS',2),(3,'student',3);
+INSERT INTO `user_type` VALUES (1,'admin'),(2,'FS'),(3,'student');
 /*!40000 ALTER TABLE `user_type` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -51,4 +48,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-10 12:53:09
+-- Dump completed on 2023-11-13 21:48:18

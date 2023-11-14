@@ -13,12 +13,12 @@ urlpatterns = [
         AddOrCheckUser.as_view(),
     ),
     path(
-        # end-point for adding user to db
+        # end-point for checking if user in db
         "current-user-privs/",
         CurrentUserPrivs.as_view(),
     ),
     path(
-        # end-point for adding user to db
+        # end-point for editing user control
         "edit-user-privs/",
         UpdateUser.as_view(),
     ),
@@ -28,17 +28,17 @@ urlpatterns = [
         ArtworkSearchView.as_view(),
     ),
     path(
-        # end-point for searching for artwork
+        # end-point for returning random artwork
         "randomartwork/",
         RandomArtworkView.as_view(),
     ),
     path(
-        # end-point for searching for artwork
+        # end-point for storing move request
         "move-request/",
         MoveRequest.as_view(),
     ),
     path(
-        # end-point for searching for artwork
+        # end-point for returning move requests associated with a user
         "find-request/",
         ReturnMoveRequest.as_view(),
     ),

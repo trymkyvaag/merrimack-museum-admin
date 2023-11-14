@@ -25,20 +25,17 @@ DROP TABLE IF EXISTS `move_request`;
 CREATE TABLE `move_request` (
   `idmove_request` int NOT NULL AUTO_INCREMENT,
   `artwork_id` int DEFAULT NULL,
-  `location_id` int DEFAULT NULL,
   `to_location` varchar(30) DEFAULT NULL,
-  `request_type_id` int DEFAULT NULL,
   `is_pending` tinyint NOT NULL,
   `is_approved` tinyint NOT NULL,
   `comments` varchar(200) DEFAULT NULL,
+  `user_id` int NOT NULL,
   PRIMARY KEY (`idmove_request`),
-  KEY `FK_MoveRequest_RequestType_idx` (`request_type_id`),
   KEY `FK_MoveRequest_Artwork_idx` (`artwork_id`),
-  KEY `FK_MoveRequest_Location_idx` (`location_id`),
+  KEY `FK_MoveRequest_User_idx` (`user_id`),
   CONSTRAINT `FK_MoveRequest_Artwork` FOREIGN KEY (`artwork_id`) REFERENCES `artwork` (`idArtwork`),
-  CONSTRAINT `FK_MoveRequest_Location` FOREIGN KEY (`location_id`) REFERENCES `location` (`idLocation`),
-  CONSTRAINT `FK_MoveRequest_RequestType` FOREIGN KEY (`request_type_id`) REFERENCES `request_type` (`idrequest_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  CONSTRAINT `FK_MoveRequest_UserAddress` FOREIGN KEY (`user_id`) REFERENCES `user` (`iduser`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,7 +44,7 @@ CREATE TABLE `move_request` (
 
 LOCK TABLES `move_request` WRITE;
 /*!40000 ALTER TABLE `move_request` DISABLE KEYS */;
-INSERT INTO `move_request` VALUES (1,1,1,'510 Turnpike',1,0,0,NULL);
+INSERT INTO `move_request` VALUES (1,1,'510 Turnpike',0,0,NULL,0),(2,1,'my house',1,0,'I need this asap',1),(3,15,'Palmisano',1,0,'Please give me this, pretty please',56);
 /*!40000 ALTER TABLE `move_request` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -60,4 +57,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-10 12:53:09
+-- Dump completed on 2023-11-13 21:48:18

@@ -206,14 +206,6 @@ class Migration(migrations.Migration):
             options={"managed": False},
         ),
         migrations.AlterModelOptions(
-            name="privs",
-            options={"managed": False},
-        ),
-        migrations.AlterModelOptions(
-            name="requesttype",
-            options={"managed": False},
-        ),
-        migrations.AlterModelOptions(
             name="user",
             options={"managed": False},
         ),
