@@ -44,13 +44,38 @@ class AddArtwork(APIView):
 
 
 class ArtworkSearchView(APIView):
+    """
+    A class used to keyword search the database
+
+    ...
+
+    Attributes
+    ----------
+    serializer_class : ArtworkSearchInputSerializer
+        class used for serializing the keyword
+
+
+    Methods
+    -------
+    post(request)
+        posts a queryset to return all matches in the database
+    """
     serializer_class = ArtworkSearchInputSerializer
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        """Prost that sends filtered queryset to the Artwork serializer
+
+        Parameters
+        ----------
+        request : request
+            request used to give the keyword data
+
+        """
         keywords = request.data.get("keyword")
+        # place all keywords in a list
         keyword_list = keywords.split() if keywords else []
         queryset = Artwork.objects.none()
+        # filter for each keyword
         for kw in keyword_list:
             q_filter = (
                 Q(title__icontains=kw)
@@ -60,10 +85,14 @@ class ArtworkSearchView(APIView):
                 | Q(location__location__icontains=kw)
                 | Q(donor__donor_name__icontains=kw)
                 | Q(category__category__icontains=kw)
+                | Q(artist__artist_name__icontains=kw)
+                | Q(title__icontains=kw)
+                | Q(date_created_year__icontains=kw)
                 # Add more fields here as needed
             )
             queryset |= Artwork.objects.filter(q_filter)
 
+        # return matching results
         results = ArtworkSerializer(queryset, many=True)
         return Response(results.data, status=status.HTTP_200_OK)
 
@@ -88,7 +117,8 @@ class AddOrCheckUser(APIView):
             if existing_user:
                 # If the user exists, return the existing user's information
                 return Response(
-                    UserSerializer(existing_user).data, status=status.HTTP_200_OK
+                    UserSerializer(
+                        existing_user).data, status=status.HTTP_200_OK
                 )
             else:
                 # If the user doesn't exist, save new user and return info
@@ -116,11 +146,13 @@ class CurrentUserPrivs(APIView):
             if existing_user:
                 # If the user verifies, return the existing user's current information
                 return Response(
-                    UserSerializer(existing_user).data, status=status.HTTP_200_OK
+                    UserSerializer(
+                        existing_user).data, status=status.HTTP_200_OK
                 )
             # Bad, request trying to elevate privs of a user that does not exist
             else:
-                error_message = {"error": "User with the given address does not exist."}
+                error_message = {
+                    "error": "User with the given address does not exist."}
                 return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
