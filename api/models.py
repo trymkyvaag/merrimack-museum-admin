@@ -12,9 +12,7 @@ class Artist(models.Model):
     idartist = models.AutoField(
         db_column="idArtist", primary_key=True
     )  # Field name made lowercase.
-    artist_name = models.CharField(
-        max_length=40, db_collation="utf8_general_ci", blank=True, null=True
-    )
+    artist_name = models.CharField(max_length=40)
 
     class Meta:
         managed = False
@@ -67,7 +65,7 @@ class Donor(models.Model):
 
 
 class Images(models.Model):
-    idimages = models.IntegerField(primary_key=True)
+    idimages = models.AutoField(primary_key=True)
     image_path = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
@@ -96,19 +94,11 @@ class MoveRequest(models.Model):
     is_approved = models.IntegerField()
     comments = models.CharField(max_length=200, blank=True, null=True)
     user = models.ForeignKey("User", models.DO_NOTHING)
+    time_stamp = models.DateTimeField()
 
     class Meta:
         managed = False
         db_table = "move_request"
-
-
-class Privs(models.Model):
-    idprivs = models.AutoField(primary_key=True)
-    privs = models.CharField(max_length=5, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = "privs"
 
 
 class User(models.Model):

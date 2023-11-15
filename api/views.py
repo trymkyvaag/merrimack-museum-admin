@@ -60,6 +60,7 @@ class ArtworkSearchView(APIView):
     post(request)
         posts a queryset to return all matches in the database
     """
+
     serializer_class = ArtworkSearchInputSerializer
 
     def post(self, request):
@@ -117,8 +118,7 @@ class AddOrCheckUser(APIView):
             if existing_user:
                 # If the user exists, return the existing user's information
                 return Response(
-                    UserSerializer(
-                        existing_user).data, status=status.HTTP_200_OK
+                    UserSerializer(existing_user).data, status=status.HTTP_200_OK
                 )
             else:
                 # If the user doesn't exist, save new user and return info
@@ -146,13 +146,11 @@ class CurrentUserPrivs(APIView):
             if existing_user:
                 # If the user verifies, return the existing user's current information
                 return Response(
-                    UserSerializer(
-                        existing_user).data, status=status.HTTP_200_OK
+                    UserSerializer(existing_user).data, status=status.HTTP_200_OK
                 )
             # Bad, request trying to elevate privs of a user that does not exist
             else:
-                error_message = {
-                    "error": "User with the given address does not exist."}
+                error_message = {"error": "User with the given address does not exist."}
                 return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

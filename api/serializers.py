@@ -67,8 +67,7 @@ class UserSerializer(serializers.ModelSerializer):
         existing_user = User.objects.filter(address=address).first()
         if not existing_user:
             # Get or create the UserType instance with a user_type of "3"
-            user_type, created = UserType.objects.get_or_create(
-                user_type="student")
+            user_type, created = UserType.objects.get_or_create(user_type="student")
             validated_data["user_type"] = user_type
             user = User.objects.create(**validated_data)
             return user
@@ -157,15 +156,13 @@ class AddArtworkSerializer(serializers.ModelSerializer):
         category_name = validated_data.pop("category")
         img_path_name = validated_data.pop("image_path")
         # Get or create an Artist instance based on artist_name
-        artist_instance, created = Artist.objects.get_or_create(
-            artist_name=artist_name)
+        artist_instance, created = Artist.objects.get_or_create(artist_name=artist_name)
 
         donor_instance = None
         # Check if donor_name exists
         if donor_name:
             # Get or create a Donor instance based on donor_name
-            donor_instance, created = Donor.objects.get_or_create(
-                donor_name=donor_name)
+            donor_instance, created = Donor.objects.get_or_create(donor_name=donor_name)
 
         # Get or create a Location instance based on location_name
         location_instance, created = Location.objects.get_or_create(
@@ -209,9 +206,10 @@ class ArtworkSearchInputSerializer(serializers.Serializer):
     Attributes
     ----------
     keyword : str
-        keywords retrieved from frontend 
+        keywords retrieved from frontend
 
     """
+
     keyword = serializers.CharField()
 
 
@@ -246,7 +244,7 @@ class RandomArtworkSerializer(serializers.Serializer):
 
 # Add move request, use case: FS requesting an artwork piece
 class MoveRequestSerializer(serializers.ModelSerializer):
-    user = UserSerializer(write_only=True)  # nester serialzier, grabs fk relation
+    user = UserSerializer()  # nester serialzier, grabs fk relation
 
     class Meta:
         model = MoveRequest
@@ -276,20 +274,32 @@ class MoveRequestSerializer(serializers.ModelSerializer):
 
 # return move requests given a username, use case: loading request page for a FS account
 class ReturnMoveRequestsSerializer(serializers.Serializer):
-    address = serializers.CharField()  # create string field
+    address = serializers.CharField()
 
     def to_representation(self, instance):
-        # grab data from string field
         address = self.validated_data["address"]
 
         # Use double underscores to traverse the foreign key relationship
-        queryset = MoveRequest.objects.filter(user__address__iexact=address)
+        queryset = MoveRequest.objects.filter(user__address__iexact=address).order_by(
+            "-time_stamp"
+        )
 
-        # Get a random set of num_artworks from the queryset
-        random_artworks = random.sample(list(queryset), num_artworks)
+        # Take only the first result (latest timestamp)
+        latest_move_request = queryset.first()
 
-        # Serialize the random artworks using the ArtworkSerializer
-        artwork_data = ArtworkSerializerStandard(
-            random_artworks, many=True).data
+        # Now you can serialize the latest MoveRequest and return the data
+        serialized_data = (
+            MoveRequestSerializer2(latest_move_request).data
+            if latest_move_request
+            else None
+        )
+        return {"move_request": serialized_data}
 
-        return {"random_artworks": artwork_data}
+
+class MoveRequestSerializer2(serializers.ModelSerializer):
+    user = UserSerializer()  # nester serialzier, grabs fk relation
+    artwork = ArtworkSerializer()
+
+    class Meta:
+        model = MoveRequest
+        fields = "__all__"
