@@ -227,7 +227,7 @@ class RandomArtworkSerializer(serializers.Serializer):
 
 # Add move request, use case: FS requesting an artwork piece
 class MoveRequestSerializer(serializers.ModelSerializer):
-    user = UserSerializer()  # nester serialzier, grabs fk relation
+    user = UserSerializer(write_only=True)  # nester serialzier, grabs fk relation
 
     class Meta:
         model = MoveRequest

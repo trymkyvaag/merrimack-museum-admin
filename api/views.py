@@ -12,6 +12,23 @@ from django.db.models import Q
 
 # Responsible for adding an artwork to the database
 # Use case: Admin -> ADD
+class ArtworksList(APIView):
+    serializer_class = ArtworkSerializerStandard
+
+    # get request type
+    def get(self, request, format=None):
+        # Query all objects from the Artwork table
+        artworks = Artwork.objects.all()
+
+        # Serialize the queryset
+        serializer = self.serializer_class(artworks, many=True)
+
+        # Return serialized data
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# Responsible for adding an artwork to the database
+# Use case: Admin -> ADD
 class AddArtwork(APIView):
     serializer_class = AddArtworkSerializer
 
@@ -152,7 +169,7 @@ class MoveRequest(APIView):
     def post(self, request, format=None):
         # grab data from serializer
         serializer = self.serializer_class(data=request.data)
-
+        print(serializer)
         if serializer.is_valid():
             serializer.save()  # save data
             return Response(

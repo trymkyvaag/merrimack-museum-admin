@@ -42,4 +42,9 @@ urlpatterns = [
         "find-request/",
         ReturnMoveRequest.as_view(),
     ),
+    path(
+        # end-point for returning move requests associated with a user
+        "artworks-list/",
+        ArtworksList.as_view(),
+    ),
 ]
