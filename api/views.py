@@ -1,59 +1,222 @@
 from django.shortcuts import render
-from .serializers import ArtworkSerializer, UserSerializer
+from .serializers import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Artwork, User
-
+from .models import *
+from .serializers import *
+from django.db.models import Q
 
 # Create your views here.
 
 
 # Responsible for adding an artwork to the database
 # Use case: Admin -> ADD
-class CreateArtworkView(APIView):
-    serializer_class = ArtworkSerializer
+class ArtworksList(APIView):
+    serializer_class = ArtworkSerializerStandard
 
+    # get request type
+    def get(self, request, format=None):
+        # Query all objects from the Artwork table
+        artworks = Artwork.objects.all()
+
+        # Serialize the queryset
+        serializer = self.serializer_class(artworks, many=True)
+
+        # Return serialized data
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# Responsible for adding an artwork to the database
+# Use case: Admin -> ADD
+class AddArtwork(APIView):
+    serializer_class = AddArtworkSerializer
+
+    # post request type
     def post(self, request, format=None):
+        # get data from serializer
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()  # This will call the custom create() method in ArtworkSerializer
+            serializer.save()  # Save data
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# Responsible for storing a user on the db
-# Use case: Login
-class AddUserEmail(APIView):
-    serializer_class = UserSerializer
+class ArtworkSearchView(APIView):
+    """
+    A class used to keyword search the database
 
+    ...
+
+    Attributes
+    ----------
+    serializer_class : ArtworkSearchInputSerializer
+        class used for serializing the keyword
+
+
+    Methods
+    -------
+    post(request)
+        posts a queryset to return all matches in the database
+    """
+
+    serializer_class = ArtworkSearchInputSerializer
+
+    def post(self, request):
+        """Prost that sends filtered queryset to the Artwork serializer
+
+        Parameters
+        ----------
+        request : request
+            request used to give the keyword data
+
+        """
+        keywords = request.data.get("keyword")
+        # place all keywords in a list
+        keyword_list = keywords.split() if keywords else []
+        queryset = Artwork.objects.none()
+        # filter for each keyword
+        for kw in keyword_list:
+            q_filter = (
+                Q(title__icontains=kw)
+                | Q(comments__icontains=kw)
+                | Q(width__icontains=kw)
+                | Q(height__icontains=kw)
+                | Q(location__location__icontains=kw)
+                | Q(donor__donor_name__icontains=kw)
+                | Q(category__category__icontains=kw)
+                | Q(artist__artist_name__icontains=kw)
+                | Q(title__icontains=kw)
+                | Q(date_created_year__icontains=kw)
+                # Add more fields here as needed
+            )
+            queryset |= Artwork.objects.filter(q_filter)
+
+        # return matching results
+        results = ArtworkSerializer(queryset, many=True)
+        return Response(results.data, status=status.HTTP_200_OK)
+
+
+# Responsible for storing a new user to the db or retrieving a current user's info
+# Use case: Login -> set header tabs and session variables correctly
+class AddOrCheckUser(APIView):
+    serializer_class = UserSerializer  # serializer data we're using
+
+    # post request type
     def post(self, request, format=None):
+        # grab data from serializer
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            # get (email) address value
+            address = serializer.validated_data["address"]
+
+            # Check if a user with the given address already exists
+            existing_user = User.objects.filter(address=address).first()
+
+            if existing_user:
+                # If the user exists, return the existing user's information
+                return Response(
+                    UserSerializer(existing_user).data, status=status.HTTP_200_OK
+                )
+            else:
+                # If the user doesn't exist, save new user and return info
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Responsible for returning a valid user
+# Use case: Checking that user selected from list does in fact exist in the db, else return error
+class CurrentUserPrivs(APIView):
+    serializer_class = UserSerializer  # serializer data we're using
+
+    # post request type
+    def post(self, request, format=None):
+        # grab data from serializer
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
             address = serializer.validated_data["address"]
-            if User.objects.filter(address=address).exists():
+
+            # Verify the given address exists
+            existing_user = User.objects.filter(address=address).first()
+
+            if existing_user:
+                # If the user verifies, return the existing user's current information
                 return Response(
-                    {"error": "Email address already exists"},
-                    status=status.HTTP_400_BAD_REQUEST,
+                    UserSerializer(existing_user).data, status=status.HTTP_200_OK
                 )
+            # Bad, request trying to elevate privs of a user that does not exist
             else:
-                serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+                error_message = {"error": "User with the given address does not exist."}
+                return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class EditArtworkView(APIView):
-    queryset = Artwork.objects.all()
-    serializer_class = ArtworkSerializer
+# Use case: Updates user privs, functionality is for admin use only
+class UpdateUser(APIView):
+    serializer_class = UpdateUserSerializer  # serializer data we're using
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+    # post request type
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer.save()  # save the data
+            return Response(
+                {"message": "User updated successfully"},
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class RandomArtworkView(APIView):
+    serializer_class = RandomArtworkSerializer
+
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            num_artworks = serializer.validated_data["num_artworks"]
+            queryset = Artwork.objects.all()
+
+            if num_artworks > queryset.count():
+                num_artworks = queryset.count()
+
+            random_artworks = random.sample(list(queryset), num_artworks)
+            artwork_serializer = ArtworkSerializer(random_artworks, many=True)
+            return Response(artwork_serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MoveRequest(APIView):
+    serializer_class = MoveRequestSerializer  # serializer data we're using
+
+    # post request type
+    def post(self, request, format=None):
+        # grab data from serializer
+        serializer = self.serializer_class(data=request.data)
+        print(serializer)
+        if serializer.is_valid():
+            serializer.save()  # save data
+            return Response(
+                {"message": "Request Type saved successfully"},
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReturnMoveRequest(APIView):
+    serializer_class = ReturnMoveRequestsSerializer  # serializer data we're usin
+
+    # post request type
+    def post(self, request, format=None):
+        # grab data from serializer
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
