@@ -126,8 +126,8 @@ class ArtworkSearchView(APIView):
 
 
 # Uses RandomArtworkSerializer and ArtworkSerializer
-class RandomArtworkView(APIView):
-    serializer_class = RandomArtworkSerializer
+class RandomArtworkViewInt(APIView):
+    serializer_class = RandomArtworkSerializerInt
 
     def post(self, request, format=None):
         # grab data from serializer
@@ -150,6 +150,33 @@ class RandomArtworkView(APIView):
             # return data
             return Response(artwork_serializer.data, status=status.HTTP_200_OK)
 
+        # return BAD request if invalid serializer
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Uses RandomArtworkSerializer and ArtworkSerializer
+class RandomArtworkViewAll(APIView):
+    serializer_class = RandomArtworkSerializerAll
+
+    def post(self, request, format=None):
+        # grab data from serializer
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():  # if valid data
+            # get string
+            all_artworks = serializer.validated_data["all_artworks"]
+            if all_artworks.lower() == "all":
+                # get all artworks
+                queryset = Artwork.objects.all()
+                artwork_serializer = ArtworkSerializer(queryset, many=True)
+                # return data
+                return Response(artwork_serializer.data, status=status.HTTP_200_OK)
+            else:
+                # Handle unexpected value error
+                return Response(
+                    {"message": "Unexpected value"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
         # return BAD request if invalid serializer
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
