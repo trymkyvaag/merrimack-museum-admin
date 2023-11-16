@@ -8,7 +8,7 @@ urlpatterns = [
         AddArtwork.as_view(),
     ),
     path(
-        # end-point for adding user to db
+        # end-point for adding or checking user
         "add-or-check-user/",
         AddOrCheckUser.as_view(),
     ),
@@ -38,12 +38,12 @@ urlpatterns = [
         MoveRequest.as_view(),
     ),
     path(
-        # end-point for returning move requests associated with a user
+        # end-point for returning the latest move request associated with a user
         "find-request/",
         ReturnMoveRequest.as_view(),
     ),
     path(
-        # end-point for returning move requests associated with a user
+        # returns entire collection of artworks
         "artworks-list/",
         ArtworksList.as_view(),
     ),
