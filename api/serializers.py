@@ -5,15 +5,7 @@ from api.models import *
 import random
 
 # ------------------------------------------------------------------------------------------------------------------
-# Standard serializers for the following tables in the database:
-
-
-# Artwork table, pk auto generated, return all fields
-class ArtworkSerializerStandard(serializers.ModelSerializer):
-    class Meta:
-        model = Artwork
-        # Fields to include when serializing or deserializing
-        fields = "__all__"
+# STANDARD serializers for all tables in the database:
 
 
 # Artist table, pk auto generated, return artist_name
@@ -51,11 +43,19 @@ class ImagesSerializer(serializers.ModelSerializer):
         fields = ["image_path"]
 
 
-# UserType table, pk auto generated, return user_type
-class UserTypeSerializer(serializers.ModelSerializer):
+# Artwork table, pk auto generated, return all fields including values of
+# foreign key id relations
+class ArtworkSerializer(serializers.ModelSerializer):
+    artist = ArtistSerializer()
+    donor = DonorSerializer()
+    location = LocationSerializer()
+    category = CategorySerializer()
+    image_path = ImagesSerializer()
+
     class Meta:
-        model = UserType
-        fields = ["user_type"]
+        model = Artwork
+        # Fields to include when serializing or deserializing
+        fields = "__all__"
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -64,13 +64,32 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["address"]
 
 
+# UserType table, pk auto generated, return user_type
+class UserTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserType
+        fields = ["user_type"]
+
+
+class MoveRequestSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    artwork = ArtworkSerializer()
+
+    class Meta:
+        model = MoveRequest
+        fields = "__all__"
+
+
 # ------------------------------------------------------------------------------------------------------------------
-# Serializers for specific end point tasks
+# Login Page Endpoints
 
 
 # AddOrCheckUserSerializer -> GOAL: Given an (email) address,
 # check whether they need to be added to the database as a new user or not.
 # UTILIZES: A custom 'User' class, pk auto generated, nested user_type
+# Use case:
+#   1. On inital login, check if user is new or returning
+#   2. After login, set header tabs correctly depending on user_type returned
 class AddOrCheckUserSerializer(serializers.ModelSerializer):
     # Nested user_type, gives actual value instead of the foreign key id
     # Set to read only because it is not used as input, only output
@@ -103,9 +122,125 @@ class AddOrCheckUserSerializer(serializers.ModelSerializer):
             return existing_user
 
 
+# ------------------------------------------------------------------------------------------------------------------
+# Gallery Page Endpoints
+
+
+# ArtworkSearchInputSerializer -> GOAL: Given a keyword as input,
+# return artwork found
+# UTILIZES: Artwork table
+# Use case:
+#   1. Using the search bar on the gallery page to search artwork by
+#   its various types (artist_name, title, etc.)
+class ArtworkSearchInputSerializer(serializers.ModelSerializer):
+    keyword = serializers.CharField()  # type: string
+
+    class Meta:
+        model = Artwork
+        fields = ["keyword"]
+
+
+# ArtworkSearchInputSerializer -> GOAL: Given an integer as input,
+# return a randomized selction in amount of the given integer
+# UTILIZES: Artwork table
+# Use case:
+#   1. When gallery page is loaded and/or refreshed,
+#   display random selection of images
+#   2. When user selects a specified integer from the dropdown, load page
+#   with updated amount of random images
+class RandomArtworkSerializer(serializers.ModelSerializer):
+    # type: int
+    num_artworks = serializers.IntegerField()
+
+    class Meta:
+        model = Artwork
+        fields = ["num_artworks"]
+
+
+# ------------------------------------------------------------------------------------------------------------------
+# Admin/FS Request Page Endpoints
+
+
+# MoveRequestSubmitionSerializer -> GOAL: Given form data for
+# an artwork move request as input, save request
+# UTILIZES: Custom MoveRequest class, nested user serializer
+# Use case:
+#   1. FS/Admin wanting to move an artwork from one location to another
+#   with a formal request
+class MoveRequestSubmitionSerializer(serializers.ModelSerializer):
+    address = UserSerializer()  # nester serialzier, grabs fk relation
+
+    class Meta:
+        model = MoveRequest
+        fields = [
+            "address",  # nested serializer value
+            "artwork",
+            "to_location",
+            "is_pending",
+            "is_approved",
+            "comments",
+            "time_stamp",
+        ]
+
+    # create request method
+    # validated data: address: string, to_location: string, is_pending: int(boolean), is_approving: int(boolean), comments: string, artwork_id: Artwork object (id)
+    def create(self, validated_data):
+        # Extract user data from the validated data
+        user_data = validated_data.pop("address", None)
+        # Try to get an existing user based on the provided data
+        user_instance = User.objects.filter(**user_data).first()
+
+        # If the user doesn't exist or the type of request isn't recognized
+        if not user_instance:
+            raise rest_serializers.ValidationError(
+                f"The specified value either does not exist or wasn'y unexpected."
+            )
+
+        # Create RequestType instance with the linked User instance
+        request_type_instance = MoveRequest.objects.create(
+            user=user_instance, **validated_data
+        )
+
+        return request_type_instance
+
+
+# return move requests given a username, use case: loading request page for a FS account
+class ReturnMoveRequestsSerializer(serializers.ModelSerializer):
+    address = serializers.CharField()
+
+    class Meta:
+        model = MoveRequest
+        fields = ["address"]
+
+    def to_representation(self, instance):
+        address = self.validated_data["address"]
+
+        # Use double underscores to traverse the foreign key relationship
+        queryset = MoveRequest.objects.filter(user__address__iexact=address).order_by(
+            "-time_stamp"
+        )
+
+        # Take only the first result (latest timestamp)
+        latest_move_request = queryset.first()
+
+        # Now you can serialize the latest MoveRequest and return the data
+        serialized_data = (
+            MoveRequestSerializer(latest_move_request).data
+            if latest_move_request
+            else None
+        )
+        return {"move_request": serialized_data}
+
+
+# ------------------------------------------------------------------------------------------------------------------
+# Admin Dashboard Endpoints
+
+
 # UpdateUserSerializer -> GOAL: Given an (email) address and user_type value,
 # check if they exist. If they do, update the user's user_type value with the new one.
 # UTILIZES: A custom 'User' class, pk auto generated, nested user_type
+# Use case:
+#   1. Admin needs to elevate or de-elevate a user's privilige
 class UpdateUserSerializer(serializers.ModelSerializer):
     # Nested user_type, gives actual value instead of the foreign key id
     # Set to read only because it is not used as input, only output
@@ -144,6 +279,8 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 # AddArtworkSerializer -> GOAL: Given the artwork data fields,
 # add a new artwork to the database. Must update relational tables.
 # UTILIZES: A custom 'Artwork' class, pk auto generated
+# Use case:
+#   1. Admin needs to add a new artwork entry into the database
 class AddArtworkSerializer(serializers.ModelSerializer):
     # Input fields the foreign keys in an artwork
     artist_name = serializers.CharField(write_only=True)
@@ -222,107 +359,3 @@ class AddArtworkSerializer(serializers.ModelSerializer):
         )
 
         return artwork_instance  # return to view
-
-
-class KeywordSerializer(serializers.Serializer):
-    keyword = serializers.CharField(required=True)
-
-
-class ArtworkSearchInputSerializer(serializers.Serializer):
-    """
-    A serializer for keyword search
-
-    ...
-
-    Attributes
-    ----------
-    keyword : str
-        keywords retrieved from frontend
-
-    """
-
-    keyword = serializers.CharField()
-
-
-# Artwork table return all fields
-class ArtworkSerializer(serializers.ModelSerializer):
-    artist = ArtistSerializer()
-    donor = DonorSerializer()
-    location = LocationSerializer()
-    category = CategorySerializer()
-    image_path = ImagesSerializer()
-
-    class Meta:
-        model = Artwork
-        # Fields to include when serializing or deserializing
-        fields = "__all__"
-
-
-# Serializer class that returns random artwork
-# Use case: when gallery page is loaded intially or refreshed
-class RandomArtworkSerializer(serializers.Serializer):
-    # create field that accepts integers only
-    num_artworks = serializers.IntegerField()
-
-
-# Add move request, use case: FS requesting an artwork piece
-class MoveRequestSerializer(serializers.ModelSerializer):
-    user = UserSerializer()  # nester serialzier, grabs fk relation
-
-    class Meta:
-        model = MoveRequest
-        fields = "__all__"
-
-    # create request
-    # validated data: address: string, to_location: string, is_pending: int(boolean), is_approving: int(boolean), comments: string, artwork_id: Artwork object (id)
-    def create(self, validated_data):
-        # Extract user data from the validated data
-        user_data = validated_data.pop("user", None)
-        # Try to get an existing user based on the provided data
-        user_instance = User.objects.filter(**user_data).first()
-
-        # If the user doesn't exist or the type of request isn't recognized
-        if not user_instance:
-            raise rest_serializers.ValidationError(
-                f"The specified values either do not exist or are unexpected."
-            )
-
-        # Create RequestType instance with the linked User instance
-        request_type_instance = MoveRequest.objects.create(
-            user=user_instance, **validated_data
-        )
-
-        return request_type_instance
-
-
-# return move requests given a username, use case: loading request page for a FS account
-class ReturnMoveRequestsSerializer(serializers.Serializer):
-    address = serializers.CharField()
-
-    def to_representation(self, instance):
-        address = self.validated_data["address"]
-
-        # Use double underscores to traverse the foreign key relationship
-        queryset = MoveRequest.objects.filter(user__address__iexact=address).order_by(
-            "-time_stamp"
-        )
-
-        # Take only the first result (latest timestamp)
-        latest_move_request = queryset.first()
-
-        # Now you can serialize the latest MoveRequest and return the data
-        serialized_data = (
-            MoveRequestSerializer2(latest_move_request).data
-            if latest_move_request
-            else None
-        )
-        return {"move_request": serialized_data}
-
-
-class MoveRequestSerializer2(serializers.ModelSerializer):
-    user = UserSerializer()  # nester serialzier, grabs fk relation
-    artwork = ArtworkSerializer()
-
-    class Meta:
-        model = MoveRequest
-        fields = "__all__"

@@ -13,7 +13,7 @@ from django.db.models import Q
 # Responsible for adding an artwork to the database
 # Use case: Admin -> ADD
 class ArtworksList(APIView):
-    serializer_class = ArtworkSerializerStandard
+    serializer_class = ArtworkSerializer
 
     # get request type
     def get(self, request, format=None):
@@ -195,7 +195,7 @@ class RandomArtworkView(APIView):
 
 
 class MoveRequest(APIView):
-    serializer_class = MoveRequestSerializer  # serializer data we're using
+    serializer_class = MoveRequestSubmitionSerializer  # serializer data we're using
 
     # post request type
     def post(self, request, format=None):
