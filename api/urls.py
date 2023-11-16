@@ -29,8 +29,13 @@ urlpatterns = [
     ),
     path(
         # end-point for returning random artwork
-        "randomartwork/",
-        RandomArtworkView.as_view(),
+        "randomartworksint/",
+        RandomArtworkViewInt.as_view(),
+    ),
+    path(
+        # end-point for returning random artwork
+        "randomartworksall/",
+        RandomArtworkViewAll.as_view(),
     ),
     path(
         # end-point for storing move request

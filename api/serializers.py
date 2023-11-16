@@ -141,20 +141,35 @@ class ArtworkSearchInputSerializer(serializers.ModelSerializer):
 
 
 # ArtworkSearchInputSerializer -> GOAL: Given an integer as input,
-# return a randomized selction in amount of the given integer
+# return a randomized selection in amount of the given integer
 # UTILIZES: Artwork table
 # Use case:
-#   1. When gallery page is loaded and/or refreshed,
-#   display random selection of images
-#   2. When user selects a specified integer from the dropdown, load page
+#   1. When user selects a specified integer from the dropdown, load page
 #   with updated amount of random images
-class RandomArtworkSerializer(serializers.ModelSerializer):
+class RandomArtworkSerializerInt(serializers.ModelSerializer):
     # type: int
     num_artworks = serializers.IntegerField()
 
     class Meta:
         model = Artwork
         fields = ["num_artworks"]
+
+
+# ArtworkSearchInputSerializer -> GOAL: Given a string as input,
+# return a randomized selection of all the artwork
+# UTILIZES: Artwork table
+# Use case:
+#   1. When gallery page is loaded and/or refreshed,
+#   display random selection of images
+#   2. When user selects "all" from the dropdown, load page
+#   with updated amount of random images
+class RandomArtworkSerializerAll(serializers.ModelSerializer):
+    # type: string
+    all_artworks = serializers.CharField()
+
+    class Meta:
+        model = Artwork
+        fields = ["all_artworks"]
 
 
 # ------------------------------------------------------------------------------------------------------------------
