@@ -101,7 +101,7 @@ class ArtworkSearchView(APIView):
 # Responsible for storing a new user to the db or retrieving a current user's info
 # Use case: Login -> set header tabs and session variables correctly
 class AddOrCheckUser(APIView):
-    serializer_class = UserSerializer  # serializer data we're using
+    serializer_class = AddOrCheckUserSerializer  # serializer data we're using
 
     # post request type
     def post(self, request, format=None):
@@ -118,7 +118,8 @@ class AddOrCheckUser(APIView):
             if existing_user:
                 # If the user exists, return the existing user's information
                 return Response(
-                    UserSerializer(existing_user).data, status=status.HTTP_200_OK
+                    AddOrCheckUserSerializer(existing_user).data,
+                    status=status.HTTP_200_OK,
                 )
             else:
                 # If the user doesn't exist, save new user and return info
@@ -130,7 +131,7 @@ class AddOrCheckUser(APIView):
 # Responsible for returning a valid user
 # Use case: Checking that user selected from list does in fact exist in the db, else return error
 class CurrentUserPrivs(APIView):
-    serializer_class = UserSerializer  # serializer data we're using
+    serializer_class = AddOrCheckUserSerializer  # serializer data we're using
 
     # post request type
     def post(self, request, format=None):
@@ -146,7 +147,8 @@ class CurrentUserPrivs(APIView):
             if existing_user:
                 # If the user verifies, return the existing user's current information
                 return Response(
-                    UserSerializer(existing_user).data, status=status.HTTP_200_OK
+                    AddOrCheckUserSerializer(existing_user).data,
+                    status=status.HTTP_200_OK,
                 )
             # Bad, request trying to elevate privs of a user that does not exist
             else:

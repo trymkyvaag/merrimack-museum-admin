@@ -4,55 +4,79 @@ from rest_framework import serializers as rest_serializers
 from api.models import *
 import random
 
+# ------------------------------------------------------------------------------------------------------------------
+# Standard serializers for the following tables in the database:
 
-# Artist table, pk auto generated
+
+# Artwork table, pk auto generated, return all fields
+class ArtworkSerializerStandard(serializers.ModelSerializer):
+    class Meta:
+        model = Artwork
+        # Fields to include when serializing or deserializing
+        fields = "__all__"
+
+
+# Artist table, pk auto generated, return artist_name
 class ArtistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artist
         fields = ["artist_name"]
 
 
-# Donor table, pk auto generated
+# Donor table, pk auto generated, return donor_name
 class DonorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Donor
         fields = ["donor_name"]
 
 
-# Location table, pk auto generated
+# Location table, pk auto generated, return location
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ["location"]
 
 
-# Category table, pk auto generated
+# Category table, pk auto generated, return category
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ["category"]
 
 
-# Images table, pk auto generated
+# Images table, pk auto generated, return image_path
 class ImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Images
         fields = ["image_path"]
 
 
-# UserType table, pk auto generated
+# UserType table, pk auto generated, return user_type
 class UserTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserType
         fields = ["user_type"]
 
 
-# User table, pk auto generated
-# Used for adding/checking users or just checking existing user privs
 class UserSerializer(serializers.ModelSerializer):
-    # Nesting user_type serializer (fk in User table)
+    class Meta:
+        model = User
+        fields = ["address"]
+
+
+# ------------------------------------------------------------------------------------------------------------------
+# Serializers for specific end point tasks
+
+
+# AddOrCheckUserSerializer -> GOAL: Given an (email) address,
+# check whether they need to be added to the database as a new user or not.
+# UTILIZES: A custom 'User' class, pk auto generated, nested user_type
+class AddOrCheckUserSerializer(serializers.ModelSerializer):
+    # Nested user_type, gives actual value instead of the foreign key id
+    # Set to read only because it is not used as input, only output
     user_type = UserTypeSerializer(read_only=True)
 
+    # Custom User class with specified fields required
     class Meta:
         model = User
         fields = ["address", "user_type"]
@@ -60,54 +84,52 @@ class UserSerializer(serializers.ModelSerializer):
     # create method for users
     # validated_data: address: "string"
     def create(self, validated_data):
-        # gets the value from the input
+        # gets the value from the inputed string address
         address = validated_data.get("address")
         # Check if the user already exists with the given email address
-        # bu searching in the User table
+        # by searching in the User table
         existing_user = User.objects.filter(address=address).first()
+        # If the user doesn't exist, create a new user
         if not existing_user:
-            # Get or create the UserType instance with a user_type of "3"
+            # Get or create the UserType instance with a user_type of "student"
             user_type, created = UserType.objects.get_or_create(user_type="student")
+            # Set new user's user_type as student
             validated_data["user_type"] = user_type
+            # Save the all the data to the database and return info to client
             user = User.objects.create(**validated_data)
             return user
-            # Get or create the UserType instance with a user_type of "3" for student access
-            # This initilizes all new users as student
-            user_type, created = UserType.objects.get_or_create(user_type="student")
-            validated_data[
-                "user_type"
-            ] = user_type  # set the validated data input (previosly null as its read only)
-            user = User.objects.create(**validated_data)  # create the user
-            return user  # return response
         else:
-            # user already exists, return their info
+            # User already exists, return their info
             return existing_user
 
 
-# Create a serializer for editing EXISTING user information
+# UpdateUserSerializer -> GOAL: Given an (email) address and user_type value,
+# check if they exist. If they do, update the user's user_type value with the new one.
+# UTILIZES: A custom 'User' class, pk auto generated, nested user_type
 class UpdateUserSerializer(serializers.ModelSerializer):
-    # Nest the user_type in here
+    # Nested user_type, gives actual value instead of the foreign key id
+    # Set to read only because it is not used as input, only output
     user_type = UserTypeSerializer()
 
+    # Custom User class with specified fields required
     class Meta:
         model = User
         fields = ["address", "user_type"]
 
-    # Lookup existing users
+    # Lookup existing users and 'create' their new information
     # validated_data: address: "string", user_type: "string"
     def create(self, validated_data):
-        # grab the value from the user_type input, first user_type is table name and second is the column name
+        # grab the user_type value, first user_type is table name and second is the column name
         user_type_value = validated_data.get("user_type")["user_type"]
-        # grab the value from the validated data
+        # grab the address value
         address = validated_data.get("address")
         # find where there's a match on the user_type input
         user_type_instance = UserType.objects.filter(user_type=user_type_value).first()
-        # if no match
+        # if no match is found
         if not user_type_instance:
             raise rest_serializers.ValidationError(
                 f"UserType with the specified user_type '{user_type_value}' does not exist."
             )
-
         # get primary key of the usertype requested
         user_type_pk = user_type_instance.pk
         # Check if the user already exists with the given email address, and if they do
@@ -119,10 +141,11 @@ class UpdateUserSerializer(serializers.ModelSerializer):
             return existing_user
 
 
-# Artwork table, handles local columns and foreign key columns
+# AddArtworkSerializer -> GOAL: Given the artwork data fields,
+# add a new artwork to the database. Must update relational tables.
+# UTILIZES: A custom 'Artwork' class, pk auto generated
 class AddArtworkSerializer(serializers.ModelSerializer):
-    # Foreign keys, not used when creating
-    # or updating model instances based on incoming data (write-only set to True)
+    # Input fields the foreign keys in an artwork
     artist_name = serializers.CharField(write_only=True)
     donor_name = serializers.CharField(
         write_only=True, required=False
@@ -131,9 +154,12 @@ class AddArtworkSerializer(serializers.ModelSerializer):
     category = serializers.CharField(write_only=True)
     image_path = serializers.CharField(write_only=True)
 
+    # custom class using the artwork model
     class Meta:
         model = Artwork
-        # Fields to include when serializing or deserializing
+        # Fields to include when serializing or deserializing, note the artist_name ... image_path are the
+        # input fields. On submission, must update the relational tables with these values then store the appropiate
+        # foreign key id's in the artwork table.
         fields = (
             "title",
             "date_created_month",
@@ -148,37 +174,42 @@ class AddArtworkSerializer(serializers.ModelSerializer):
             "image_path",
         )
 
+    # create method for adding the artwork
     def create(self, validated_data):
-        # Extract artist_name, donor_name, location_name, and category_name from the validated data
+        # Extract artist_name, donor_name, location_name, and category_name VALUES from the validated data
         artist_name = validated_data.pop("artist_name")
         donor_name = validated_data.pop("donor_name", None)
         location_name = validated_data.pop("location")
         category_name = validated_data.pop("category")
         img_path_name = validated_data.pop("image_path")
-        # Get or create an Artist instance based on artist_name
+
+        # FOR EACH instance of the extracted values, get or create them in the corresponding
+        # relational table
+
+        # Get or create a new artist in table: Artist
         artist_instance, created = Artist.objects.get_or_create(artist_name=artist_name)
 
         donor_instance = None
         # Check if donor_name exists
         if donor_name:
-            # Get or create a Donor instance based on donor_name
+            # Get or create a new donor in table: Donor
             donor_instance, created = Donor.objects.get_or_create(donor_name=donor_name)
 
-        # Get or create a Location instance based on location_name
+        # Get or create a new location in table Location
         location_instance, created = Location.objects.get_or_create(
             location=location_name
         )
 
-        # Get or create a Category instance based on category_name
+        # Get or create a new category in table: Category
         category_instance, created = Category.objects.get_or_create(
             category=category_name
         )
-
+        # Get or create a new image_path in table: Images
         image_path_instance, created = Images.objects.get_or_create(
             image_path=img_path_name
         )
 
-        image_path_instance.save()
+        image_path_instance.save()  # not sure why I need to save this but it's breaking if I don't
 
         # Create an Artwork instance, associating it with the Artist, Donor, Location, and Category instances
         artwork_instance = Artwork.objects.create(
@@ -187,10 +218,10 @@ class AddArtworkSerializer(serializers.ModelSerializer):
             location=location_instance,
             category=category_instance,
             image_path=image_path_instance,
-            **validated_data,  # Include the remaining validated data
+            **validated_data,  # Include the remaining validated data aka the nonrelational fields like title and date_created_-
         )
 
-        return artwork_instance
+        return artwork_instance  # return to view
 
 
 class KeywordSerializer(serializers.Serializer):
@@ -221,14 +252,6 @@ class ArtworkSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     image_path = ImagesSerializer()
 
-    class Meta:
-        model = Artwork
-        # Fields to include when serializing or deserializing
-        fields = "__all__"
-
-
-# Artwork table return all fields
-class ArtworkSerializerStandard(serializers.ModelSerializer):
     class Meta:
         model = Artwork
         # Fields to include when serializing or deserializing
