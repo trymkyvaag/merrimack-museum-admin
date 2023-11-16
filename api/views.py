@@ -6,6 +6,7 @@ from rest_framework import status
 from .models import *
 from .serializers import *
 from django.db.models import Q
+from random import shuffle
 
 # Create your views here.
 
@@ -126,6 +127,7 @@ class ArtworkSearchView(APIView):
 
 
 # Uses RandomArtworkSerializer and ArtworkSerializer
+# Used for recieving integer inputs
 class RandomArtworkViewInt(APIView):
     serializer_class = RandomArtworkSerializerInt
 
@@ -155,6 +157,7 @@ class RandomArtworkViewInt(APIView):
 
 
 # Uses RandomArtworkSerializer and ArtworkSerializer
+# Used for recieving string inputs
 class RandomArtworkViewAll(APIView):
     serializer_class = RandomArtworkSerializerAll
 
@@ -168,6 +171,8 @@ class RandomArtworkViewAll(APIView):
             if all_artworks.lower() == "all":
                 # get all artworks
                 queryset = Artwork.objects.all()
+                queryset = list(queryset)  # Convert the queryset to a list
+                shuffle(queryset)  # Shuffle the list to randomize the order
                 artwork_serializer = ArtworkSerializer(queryset, many=True)
                 # return data
                 return Response(artwork_serializer.data, status=status.HTTP_200_OK)
