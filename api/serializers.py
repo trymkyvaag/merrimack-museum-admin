@@ -374,3 +374,55 @@ class AddArtworkSerializer(serializers.ModelSerializer):
         )
 
         return artwork_instance  # return to view
+
+
+class EditArtworkSerializer(serializers.ModelSerializer):
+    artist = ArtistSerializer(required=False)
+    donor = DonorSerializer(required=False)
+    location = LocationSerializer(required=False)
+    category = CategorySerializer(required=False)
+    image_path = ImagesSerializer(required=False)
+
+    class Meta:
+        model = Artwork
+        fields = "__all__"
+
+    def update(self, instance, validated_data):
+        artist_data = validated_data.pop("artist", None)
+        donor_data = validated_data.pop("donor", None)
+        location_data = validated_data.pop("location", None)
+        category_data = validated_data.pop("category", None)
+        image_path = validated_data.pop("image_path", None)
+
+        instance = super().update(instance, validated_data)
+
+        if artist_data:
+            artist_instance, created = Artist.objects.get_or_create(**artist_data)
+            instance.artist = artist_instance
+        if donor_data:
+            donor_instance, created = Donor.objects.get_or_create(**donor_data)
+            instance.donor = donor_instance
+        if location_data:
+            location_instance, created = Location.objects.get_or_create(**location_data)
+            instance.location = location_instance
+        if category_data:
+            category_instance, created = Category.objects.get_or_create(**category_data)
+            instance.category = category_instance
+        if image_path:
+            image_path_instance, created = Images.objects.get_or_create(**image_path)
+            instance.image_path = image_path_instance
+
+        # Update the fields of the instance manually
+        instance.title = validated_data.get("title", instance.title)
+        instance.date_created_month = validated_data.get(
+            "date_created_month", instance.date_created_month
+        )
+        instance.date_created_year = validated_data.get(
+            "date_created_year", instance.date_created_year
+        )
+        instance.comments = validated_data.get("comments", instance.comments)
+        instance.width = validated_data.get("width", instance.width)
+        instance.height = validated_data.get("height", instance.height)
+
+        instance.save()
+        return instance
