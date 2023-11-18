@@ -304,7 +304,7 @@ class AddArtworkSerializer(serializers.ModelSerializer):
     )  # donor name is not required
     location = serializers.CharField(write_only=True)
     category = serializers.CharField(write_only=True)
-    image_path = serializers.CharField(write_only=True)
+    # image_path = serializers.CharField(write_only=True)
 
     # custom class using the artwork model
     class Meta:
@@ -323,7 +323,6 @@ class AddArtworkSerializer(serializers.ModelSerializer):
             "donor_name",
             "location",
             "category",
-            "image_path",
         )
 
     # create method for adding the artwork
@@ -333,7 +332,7 @@ class AddArtworkSerializer(serializers.ModelSerializer):
         donor_name = validated_data.pop("donor_name", None)
         location_name = validated_data.pop("location")
         category_name = validated_data.pop("category")
-        img_path_name = validated_data.pop("image_path")
+        # img_path_name = validated_data.pop("image_path")
 
         # FOR EACH instance of the extracted values, get or create them in the corresponding
         # relational table
@@ -357,11 +356,11 @@ class AddArtworkSerializer(serializers.ModelSerializer):
             category=category_name
         )
         # Get or create a new image_path in table: Images
-        image_path_instance, created = Images.objects.get_or_create(
-            image_path=img_path_name
-        )
+        # image_path_instance, created = Images.objects.get_or_create(
+        #     image_path=img_path_name
+        # )
 
-        image_path_instance.save()  # not sure why I need to save this but it's breaking if I don't
+        # image_path_instance.save()  # not sure why I need to save this but it's breaking if I don't
 
         # Create an Artwork instance, associating it with the Artist, Donor, Location, and Category instances
         artwork_instance = Artwork.objects.create(
@@ -369,7 +368,7 @@ class AddArtworkSerializer(serializers.ModelSerializer):
             donor=donor_instance,
             location=location_instance,
             category=category_instance,
-            image_path=image_path_instance,
+            # image_path=image_path_instance,
             **validated_data,  # Include the remaining validated data aka the nonrelational fields like title and date_created_-
         )
 
