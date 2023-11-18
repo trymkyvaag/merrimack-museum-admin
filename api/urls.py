@@ -52,4 +52,6 @@ urlpatterns = [
         "artworks-list/",
         ArtworksList.as_view(),
     ),
+    # Updates artwork
+    path("update-artwork/<int:pk>/", EditArtwork.as_view(), name="edit-artwork"),
 ]

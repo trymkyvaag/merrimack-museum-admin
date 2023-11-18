@@ -261,3 +261,24 @@ class AddArtwork(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         # return BAD request if invalid serializer
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Uses EditArtworkSerializer data
+class EditArtwork(APIView):
+    def put(self, request, pk):
+        # Step 1: Retrieve the instance to be updated
+        try:
+            artwork = Artwork.objects.get(pk=pk)
+        except Artwork.DoesNotExist:
+            return Response(
+                {"error": "Artwork not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Step 2: Instantiate the serializer with the existing instance and the updated data
+        serializer = EditArtworkSerializer(artwork, data=request.data)
+
+        # Step 3: Validate and save the serializer
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
