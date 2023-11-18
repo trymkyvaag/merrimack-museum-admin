@@ -1,4 +1,6 @@
 
 /venv
 .vscode/*
-/__pychache__/*
+*/__pychache__/*
+*/migrations/*.pyc
+*/migrations/*.py
