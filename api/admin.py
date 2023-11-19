@@ -58,5 +58,8 @@ class MigrationRequestAdmin(admin.ModelAdmin):
 
 @admin.register(ArtworkImage)
 class ArtworkImageAdmin(admin.ModelAdmin):
-    list_display = ('artwork', 'image_file', 'description')
+    list_display = ('artwork_name', 'image_file', 'description')
     search_fields = ('artwork__title', 'description')
+
+    def artwork_name(self, obj):
+        return obj.artwork.title
