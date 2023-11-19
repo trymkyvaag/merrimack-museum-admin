@@ -420,9 +420,15 @@ class EditArtworkSerializer(serializers.ModelSerializer):
         instance.date_created_year = validated_data.get(
             "date_created_year", instance.date_created_year
         )
+        instance.donor = validated_data.get("donor", instance.donor)
+        instance.artist = validated_data.get("artist", instance.artist)
         instance.comments = validated_data.get("comments", instance.comments)
         instance.width = validated_data.get("width", instance.width)
         instance.height = validated_data.get("height", instance.height)
 
         instance.save()
         return instance
+
+    def delete(self, instance):
+        # Delete the instance
+        instance.delete()
