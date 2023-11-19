@@ -439,4 +439,4 @@ class MoveRequestUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MoveRequest
-        fields = ["type", "is_pending", "is_approved"]
+        fields = ["type"]
