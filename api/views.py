@@ -191,7 +191,7 @@ class RandomArtworkViewAll(APIView):
 
 
 # Uses: MoveRequestSubmitionSerializer
-class MoveRequest(APIView):
+class MoveRequestSave(APIView):
     serializer_class = MoveRequestSubmitionSerializer  # serializer data we're using
 
     # post request type
@@ -292,3 +292,53 @@ class EditArtwork(APIView):
             )
         artwork.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class MigrationsList(APIView):
+    serializer_class = MoveRequestSerializer
+
+    # 'get' request type
+    def get(self, request, format=None):
+        # Filter MoveRequest objects where is_pending is equal to 1
+        artworks = MoveRequest.objects.filter(is_pending=1)
+
+        # Serialize the queryset
+        serializer = self.serializer_class(artworks, many=True)
+
+        # Return serialized data
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class MigrationsUpdate(APIView):
+    serializer_class = MoveRequestUpdateSerializer
+
+    # 'put' request type for updating is_pending and is_approved
+    def put(self, request, pk, format=None):
+        try:
+            # Retrieve the MoveRequest object with the given primary key (pk)
+            artwork = MoveRequest.objects.get(pk=pk)
+
+            # Update is_pending to 0
+            artwork.is_pending = 0
+
+            # Check the input string and update is_approved accordingly
+            approval_status = request.data.get(
+                "type"
+            )  # Assuming the input string is passed in the request data
+            if approval_status == "approve":
+                artwork.is_approved = 1
+            else:
+                artwork.is_approved = 0
+
+            # Save the updated object
+            artwork.save()
+
+            # Serialize the updated object
+            serializer = self.serializer_class(artwork)
+
+            # Return serialized data
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except MoveRequest.DoesNotExist:
+            return Response(
+                {"error": "MoveRequest not found"}, status=status.HTTP_404_NOT_FOUND
+            )

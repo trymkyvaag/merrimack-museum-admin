@@ -432,3 +432,11 @@ class EditArtworkSerializer(serializers.ModelSerializer):
     def delete(self, instance):
         # Delete the instance
         instance.delete()
+
+
+class MoveRequestUpdateSerializer(serializers.ModelSerializer):
+    type = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = MoveRequest
+        fields = ["type", "is_pending", "is_approved"]

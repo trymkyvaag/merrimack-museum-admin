@@ -40,7 +40,7 @@ urlpatterns = [
     path(
         # end-point for storing move request
         "move-request/",
-        MoveRequest.as_view(),
+        MoveRequestSave.as_view(),
     ),
     path(
         # end-point for returning the latest move request associated with a user
@@ -54,4 +54,11 @@ urlpatterns = [
     ),
     # Updates artwork
     path("update-artwork/<int:pk>/", EditArtwork.as_view(), name="edit-artwork"),
+    path("migrations-get/", MigrationsList.as_view(), name="migrations-get"),
+    # Path for the 'put' request, including the primary key (pk) parameter
+    path(
+        "migrations-update/<int:pk>/",
+        MigrationsUpdate.as_view(),
+        name="migrations-update",
+    ),
 ]
