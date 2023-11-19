@@ -24,26 +24,6 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(user)
         return Response(serializer.data)
 
-class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-
-class LocationViewSet(viewsets.ModelViewSet):
-    queryset = Location.objects.all()
-    serializer_class = LocationSerializer
-
-class DonorViewSet(viewsets.ModelViewSet):
-    queryset = Donor.objects.all()
-    serializer_class = DonorSerializer
-
-class ArtistViewSet(viewsets.ModelViewSet):
-    queryset = Artist.objects.all()
-    serializer_class = ArtistSerializer
-
-class ArtworkViewSet(viewsets.ModelViewSet):
-    queryset = Artwork.objects.all()
-    serializer_class = ArtworkSerializer
-
 class MigrationRequestViewSet(viewsets.ModelViewSet):
     queryset = MigrationRequest.objects.all()
     serializer_class = MigrationRequestSerializer
@@ -64,3 +44,23 @@ class ArtworkImageViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         image_url = f"{settings.AWS_S3_CUSTOM_DOMAIN}/{instance.image_file.name}"
         return Response({'image_url': image_url, 'data': serializer.data})
+    
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+class LocationViewSet(viewsets.ModelViewSet):
+    queryset = Location.objects.all()
+    serializer_class = LocationSerializer
+
+class DonorViewSet(viewsets.ModelViewSet):
+    queryset = Donor.objects.all()
+    serializer_class = DonorSerializer
+
+class ArtistViewSet(viewsets.ModelViewSet):
+    queryset = Artist.objects.all()
+    serializer_class = ArtistSerializer
+
+class ArtworkViewSet(viewsets.ModelViewSet):
+    queryset = Artwork.objects.all()
+    serializer_class = ArtworkSerializer
