@@ -1,376 +1,119 @@
-from rest_framework import serializers, status
-from rest_framework.response import Response
-from rest_framework import serializers as rest_serializers
-from api.models import *
-import random
+from rest_framework import serializers
+from .models import *
 
-# ------------------------------------------------------------------------------------------------------------------
-# STANDARD serializers for all tables in the database:
-
-
-# Artist table, pk auto generated, return artist_name
-class ArtistSerializer(serializers.ModelSerializer):
+class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Artist
-        fields = ["artist_name"]
+        model = CustomUser
+        fields = ('id', 'username', 'email', 'is_admin', 'is_faculty', 'is_student')
 
-
-# Donor table, pk auto generated, return donor_name
-class DonorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Donor
-        fields = ["donor_name"]
-
-
-# Location table, pk auto generated, return location
-class LocationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Location
-        fields = ["location"]
-
-
-# Category table, pk auto generated, return category
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ["category"]
+        fields = ('id', 'category_name', 'description')
 
-
-# Images table, pk auto generated, return image_path
-class ImagesSerializer(serializers.ModelSerializer):
+class LocationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Images
-        fields = ["image_path"]
+        model = Location
+        fields = ('id', 'location_name', 'address', 'city', 'state', 'country')
 
+class DonorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Donor
+        fields = ('id', 'donor_name', 'contact_email', 'donation_date')
 
-# Artwork table, pk auto generated, return all fields including values of
-# foreign key id relations
+class ArtistSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Artist
+        fields = ('id', 'artist_name', 'birth_date', 'nationality', 'bio')
+
 class ArtworkSerializer(serializers.ModelSerializer):
-    artist = ArtistSerializer()
-    donor = DonorSerializer()
-    location = LocationSerializer()
-    category = CategorySerializer()
-    image_path = ImagesSerializer()
+    artist_id = serializers.IntegerField(source='artist.id')
+    artist_name = serializers.CharField(source='artist.artist_name')
+    artist_birth_date = serializers.DateField(source='artist.birth_date')
+    artist_nationality = serializers.CharField(source='artist.nationality')
+    artist_bio = serializers.CharField(source='artist.bio')
+
+    category_id = serializers.IntegerField(source='category.id')
+    category_name = serializers.CharField(source='category.category_name')
+    category_description = serializers.CharField(source='category.description')
+
+    location_id = serializers.IntegerField(source='location.id')
+    location_name = serializers.CharField(source='location.location_name')
+    location_address = serializers.CharField(source='location.address')
+    location_city = serializers.CharField(source='location.city')
+    location_state = serializers.CharField(source='location.state')
+    location_country = serializers.CharField(source='location.country')
+
+    donor_id = serializers.IntegerField(source='donor.id')
+    donor_name = serializers.CharField(source='donor.donor_name')
+    donor_contact_email = serializers.EmailField(source='donor.contact_email')
+    donor_donation_date = serializers.DateField(source='donor.donation_date')
 
     class Meta:
         model = Artwork
-        # Fields to include when serializing or deserializing
-        fields = "__all__"
+        fields = ('id', 'artist_id', 'artist_name', 'artist_birth_date', 'artist_nationality', 'artist_bio',
+                  'title', 'creation_date', 'description',
+                  'category_id', 'category_name', 'category_description',
+                  'location_id', 'location_name', 'location_address', 'location_city', 'location_state', 'location_country',
+                  'donor_id', 'donor_name', 'donor_contact_email', 'donor_donation_date')
 
+class MigrationRequestSerializer(serializers.ModelSerializer):
+    artwork_id = serializers.IntegerField(source='artwork.id')
+    artwork_title = serializers.CharField(source='artwork.title')
+    artwork_creation_date = serializers.DateField(source='artwork.creation_date')
+    artwork_description = serializers.CharField(source='artwork.description')
 
-class UserSerializer(serializers.ModelSerializer):
+    current_location_id = serializers.IntegerField(source='current_location.id')
+    current_location_name = serializers.CharField(source='current_location.location_name')
+    current_location_address = serializers.CharField(source='current_location.address')
+    current_location_city = serializers.CharField(source='current_location.city')
+    current_location_state = serializers.CharField(source='current_location.state')
+    current_location_country = serializers.CharField(source='current_location.country')
+
+    # new_location_id = serializers.IntegerField(source='new_location.id')
+    new_location_name = serializers.CharField(source='new_location.location_name')
+    new_location_address = serializers.CharField(source='new_location.address')
+    new_location_city = serializers.CharField(source='new_location.city')
+    new_location_state = serializers.CharField(source='new_location.state')
+    new_location_country = serializers.CharField(source='new_location.country')
+
+    email = serializers.EmailField(required=False)
+
     class Meta:
-        model = User
-        fields = ["address"]
+        model = MigrationRequest
+        fields = ('id', 'email', 'artwork_id', 'artwork_title', 'artwork_creation_date', 'artwork_description',
+                  'request_date', 'current_location_id', 'current_location_name', 'current_location_address',
+                  'current_location_city', 'current_location_state', 'current_location_country',
+                  'new_location_name', 'new_location_address',
+                  'new_location_city', 'new_location_state', 'new_location_country', 'status')
 
-
-# UserType table, pk auto generated, return user_type
-class UserTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserType
-        fields = ["user_type"]
-
-
-class MoveRequestSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    artwork = ArtworkSerializer()
-
-    class Meta:
-        model = MoveRequest
-        fields = "__all__"
-
-
-# ------------------------------------------------------------------------------------------------------------------
-# Login Page Endpoints
-
-
-# AddOrCheckUserSerializer -> GOAL: Given an (email) address,
-# check whether they need to be added to the database as a new user or not.
-# UTILIZES: A custom 'User' class, pk auto generated, nested user_type
-# Use case:
-#   1. On inital login, check if user is new or returning
-#   2. After login, set header tabs correctly depending on user_type returned
-class AddOrCheckUserSerializer(serializers.ModelSerializer):
-    # Nested user_type, gives actual value instead of the foreign key id
-    # Set to read only because it is not used as input, only output
-    user_type = UserTypeSerializer(read_only=True)
-
-    # Custom User class with specified fields required
-    class Meta:
-        model = User
-        fields = ["address", "user_type"]
-
-    # create method for users
-    # validated_data: address: "string"
     def create(self, validated_data):
-        # gets the value from the inputed string address
-        address = validated_data.get("address")
-        # Check if the user already exists with the given email address
-        # by searching in the User table
-        existing_user = User.objects.filter(address=address).first()
-        # If the user doesn't exist, create a new user
-        if not existing_user:
-            # Get or create the UserType instance with a user_type of "student"
-            user_type, created = UserType.objects.get_or_create(user_type="student")
-            # Set new user's user_type as student
-            validated_data["user_type"] = user_type
-            # Save the all the data to the database and return info to client
-            user = User.objects.create(**validated_data)
-            return user
-        else:
-            # User already exists, return their info
-            return existing_user
+        # Extract nested data
+        artwork_data = validated_data.pop('artwork', {})
+        current_location_data = validated_data.pop('current_location', {})
+        new_location_data = validated_data.pop('new_location', {})
+        
+        # Extract email from validated_data
+        email = validated_data.pop('email', None)
 
+        # Create or retrieve related objects
+        artwork_instance, _ = Artwork.objects.get_or_create(**artwork_data)
+        current_location_instance, _ = Location.objects.get_or_create(**current_location_data)
+        new_location_instance, _ = Location.objects.get_or_create(**new_location_data)
 
-# ------------------------------------------------------------------------------------------------------------------
-# Gallery Page Endpoints
+        # Create the MigrationRequest object with the user
+        migration_request = MigrationRequest.objects.create(
+            email=email,
+            artwork=artwork_instance,
+            current_location=current_location_instance,
+            new_location=new_location_instance,
+            **validated_data
+        )
 
-
-# ArtworkSearchInputSerializer -> GOAL: Given a keyword as input,
-# return artwork found
-# UTILIZES: Artwork table
-# Use case:
-#   1. Using the search bar on the gallery page to search artwork by
-#   its various types (artist_name, title, etc.)
-class ArtworkSearchInputSerializer(serializers.ModelSerializer):
-    keyword = serializers.CharField()  # type: string
-
+        return migration_request
+    
+class ArtworkImageSerializer(serializers.ModelSerializer):
+    artwork_data = ArtworkSerializer(source='artwork', read_only=True)
     class Meta:
-        model = Artwork
-        fields = ["keyword"]
-
-
-# ArtworkSearchInputSerializer -> GOAL: Given an integer as input,
-# return a randomized selection in amount of the given integer
-# UTILIZES: Artwork table
-# Use case:
-#   1. When user selects a specified integer from the dropdown, load page
-#   with updated amount of random images
-class RandomArtworkSerializerInt(serializers.ModelSerializer):
-    # type: int
-    num_artworks = serializers.IntegerField()
-
-    class Meta:
-        model = Artwork
-        fields = ["num_artworks"]
-
-
-# ArtworkSearchInputSerializer -> GOAL: Given a string as input,
-# return a randomized selection of all the artwork
-# UTILIZES: Artwork table
-# Use case:
-#   1. When gallery page is loaded and/or refreshed,
-#   display random selection of images
-#   2. When user selects "all" from the dropdown, load page
-#   with updated amount of random images
-class RandomArtworkSerializerAll(serializers.ModelSerializer):
-    # type: string
-    all_artworks = serializers.CharField()
-
-    class Meta:
-        model = Artwork
-        fields = ["all_artworks"]
-
-
-# ------------------------------------------------------------------------------------------------------------------
-# Admin/FS Request Page Endpoints
-
-
-# MoveRequestSubmitionSerializer -> GOAL: Given form data for
-# an artwork move request as input, save request
-# UTILIZES: Custom MoveRequest class, nested user serializer
-# Use case:
-#   1. FS/Admin wanting to move an artwork from one location to another
-#   with a formal request
-class MoveRequestSubmitionSerializer(serializers.ModelSerializer):
-    address = UserSerializer()  # nester serialzier, grabs fk relation
-
-    class Meta:
-        model = MoveRequest
-        fields = [
-            "address",  # nested serializer value
-            "artwork",
-            "to_location",
-            "is_pending",
-            "is_approved",
-            "comments",
-            "time_stamp",
-        ]
-
-    # create request method
-    # validated data: address: string, to_location: string, is_pending: int(boolean), is_approving: int(boolean), comments: string, artwork_id: Artwork object (id)
-    def create(self, validated_data):
-        # Extract user data from the validated data
-        user_data = validated_data.pop("address", None)
-        # Try to get an existing user based on the provided data
-        user_instance = User.objects.filter(**user_data).first()
-
-        # If the user doesn't exist or the type of request isn't recognized
-        if not user_instance:
-            raise rest_serializers.ValidationError(
-                f"The specified value either does not exist or wasn'y unexpected."
-            )
-
-        # Create RequestType instance with the linked User instance
-        request_type_instance = MoveRequest.objects.create(
-            user=user_instance, **validated_data
-        )
-
-        return request_type_instance
-
-
-# return move requests given a username, use case: loading request page for a FS account
-class ReturnMoveRequestsSerializer(serializers.ModelSerializer):
-    address = serializers.CharField()
-
-    class Meta:
-        model = MoveRequest
-        fields = ["address"]
-
-    def to_representation(self, instance):
-        address = self.validated_data["address"]
-
-        # Use double underscores to traverse the foreign key relationship
-        queryset = MoveRequest.objects.filter(user__address__iexact=address).order_by(
-            "-time_stamp"
-        )
-
-        # Take only the first result (latest timestamp)
-        latest_move_request = queryset.first()
-
-        # Now you can serialize the latest MoveRequest and return the data
-        serialized_data = (
-            MoveRequestSerializer(latest_move_request).data
-            if latest_move_request
-            else None
-        )
-        return {"move_request": serialized_data}
-
-
-# ------------------------------------------------------------------------------------------------------------------
-# Admin Dashboard Endpoints
-
-
-# UpdateUserSerializer -> GOAL: Given an (email) address and user_type value,
-# check if they exist. If they do, update the user's user_type value with the new one.
-# UTILIZES: A custom 'User' class, pk auto generated, nested user_type
-# Use case:
-#   1. Admin needs to elevate or de-elevate a user's privilige
-class UpdateUserSerializer(serializers.ModelSerializer):
-    # Nested user_type, gives actual value instead of the foreign key id
-    # Set to read only because it is not used as input, only output
-    user_type = UserTypeSerializer()
-
-    # Custom User class with specified fields required
-    class Meta:
-        model = User
-        fields = ["address", "user_type"]
-
-    # Lookup existing users and 'create' their new information
-    # validated_data: address: "string", user_type: "string"
-    def create(self, validated_data):
-        # grab the user_type value, first user_type is table name and second is the column name
-        user_type_value = validated_data.get("user_type")["user_type"]
-        # grab the address value
-        address = validated_data.get("address")
-        # find where there's a match on the user_type input
-        user_type_instance = UserType.objects.filter(user_type=user_type_value).first()
-        # if no match is found
-        if not user_type_instance:
-            raise rest_serializers.ValidationError(
-                f"UserType with the specified user_type '{user_type_value}' does not exist."
-            )
-        # get primary key of the usertype requested
-        user_type_pk = user_type_instance.pk
-        # Check if the user already exists with the given email address, and if they do
-        # then update their fk user_type value with the new one
-        existing_user = User.objects.filter(address=address).first()
-        if existing_user:
-            existing_user.user_type_id = user_type_pk
-            existing_user.save()
-            return existing_user
-
-
-# AddArtworkSerializer -> GOAL: Given the artwork data fields,
-# add a new artwork to the database. Must update relational tables.
-# UTILIZES: A custom 'Artwork' class, pk auto generated
-# Use case:
-#   1. Admin needs to add a new artwork entry into the database
-class AddArtworkSerializer(serializers.ModelSerializer):
-    # Input fields the foreign keys in an artwork
-    artist_name = serializers.CharField(write_only=True)
-    donor_name = serializers.CharField(
-        write_only=True, required=False
-    )  # donor name is not required
-    location = serializers.CharField(write_only=True)
-    category = serializers.CharField(write_only=True)
-    image_path = serializers.CharField(write_only=True)
-
-    # custom class using the artwork model
-    class Meta:
-        model = Artwork
-        # Fields to include when serializing or deserializing, note the artist_name ... image_path are the
-        # input fields. On submission, must update the relational tables with these values then store the appropiate
-        # foreign key id's in the artwork table.
-        fields = (
-            "title",
-            "date_created_month",
-            "date_created_year",
-            "comments",
-            "width",
-            "height",
-            "artist_name",
-            "donor_name",
-            "location",
-            "category",
-            "image_path",
-        )
-
-    # create method for adding the artwork
-    def create(self, validated_data):
-        # Extract artist_name, donor_name, location_name, and category_name VALUES from the validated data
-        artist_name = validated_data.pop("artist_name")
-        donor_name = validated_data.pop("donor_name", None)
-        location_name = validated_data.pop("location")
-        category_name = validated_data.pop("category")
-        img_path_name = validated_data.pop("image_path")
-
-        # FOR EACH instance of the extracted values, get or create them in the corresponding
-        # relational table
-
-        # Get or create a new artist in table: Artist
-        artist_instance, created = Artist.objects.get_or_create(artist_name=artist_name)
-
-        donor_instance = None
-        # Check if donor_name exists
-        if donor_name:
-            # Get or create a new donor in table: Donor
-            donor_instance, created = Donor.objects.get_or_create(donor_name=donor_name)
-
-        # Get or create a new location in table Location
-        location_instance, created = Location.objects.get_or_create(
-            location=location_name
-        )
-
-        # Get or create a new category in table: Category
-        category_instance, created = Category.objects.get_or_create(
-            category=category_name
-        )
-        # Get or create a new image_path in table: Images
-        image_path_instance, created = Images.objects.get_or_create(
-            image_path=img_path_name
-        )
-
-        image_path_instance.save()  # not sure why I need to save this but it's breaking if I don't
-
-        # Create an Artwork instance, associating it with the Artist, Donor, Location, and Category instances
-        artwork_instance = Artwork.objects.create(
-            artist=artist_instance,
-            donor=donor_instance,
-            location=location_instance,
-            category=category_instance,
-            image_path=image_path_instance,
-            **validated_data,  # Include the remaining validated data aka the nonrelational fields like title and date_created_-
-        )
-
-        return artwork_instance  # return to view
+        model = ArtworkImage
+        fields = ('id', 'artwork_data', 'image_file', 'description')
