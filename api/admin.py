@@ -1,6 +1,13 @@
 from django.contrib import admin
 from .models import CustomUser, Category, Location, Donor, Artist, Artwork, MigrationRequest, ArtworkImage
 
+# try:
+#     from rest_framework.authtoken.models import TokenProxy as DRFToken
+# except ImportError:
+#     from rest_framework.authtoken.models import Token as DRFToken
+
+# admin.site.unregister(DRFToken)
+
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ('username', 'is_faculty', 'is_student', 'is_admin')
@@ -52,9 +59,12 @@ class ArtworkAdmin(admin.ModelAdmin):
 
 @admin.register(MigrationRequest)
 class MigrationRequestAdmin(admin.ModelAdmin):
-    list_display = ('email', 'artwork', 'request_date', 'status')
+    list_display = ('email', 'artwork_name', 'request_date', 'status')
     list_filter = ('status', 'request_date')
     search_fields = ('email', 'artwork__name') 
+
+    def artwork_name(self, obj):
+        return obj.artwork.title
 
 @admin.register(ArtworkImage)
 class ArtworkImageAdmin(admin.ModelAdmin):
