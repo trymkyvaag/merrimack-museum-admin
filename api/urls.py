@@ -52,6 +52,11 @@ urlpatterns = [
         "artworks-list/",
         ArtworksList.as_view(),
     ),
+    path(
+        # returns entire collection of artworks
+        "artworks-list-filtered/",
+        ArtworksListFiltered.as_view(),
+    ),
     # Updates artwork
     path("update-artwork/<int:pk>/", EditArtwork.as_view(), name="edit-artwork"),
     path("migrations-get/", MigrationsList.as_view(), name="migrations-get"),

@@ -29,6 +29,22 @@ class ArtworksList(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# Standard db table views
+# Uses ArtworkSerializer data, filtered on data that is not pending in a move request
+class ArtworksListFiltered(APIView):
+    serializer_class = ArtworkSerializer
+
+    def get(self, request, format=None):
+        # Query artworks that do not have a corresponding move request with is_pending set to 1
+        artworks = Artwork.objects.exclude(moverequest__is_pending=1)
+
+        # Serialize the queryset
+        serializer = self.serializer_class(artworks, many=True)
+
+        # Return serialized data
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 # ------------------------------------------------------------------------------------------------------------------
 # Login Page Views
 # Uses: AddOrCheckUserSerializer data
