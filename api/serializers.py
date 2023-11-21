@@ -111,7 +111,8 @@ class AddOrCheckUserSerializer(serializers.ModelSerializer):
         # If the user doesn't exist, create a new user
         if not existing_user:
             # Get or create the UserType instance with a user_type of "student"
-            user_type, created = UserType.objects.get_or_create(user_type="student")
+            user_type, created = UserType.objects.get_or_create(
+                user_type="student")
             # Set new user's user_type as student
             validated_data["user_type"] = user_type
             # Save the all the data to the database and return info to client
@@ -133,7 +134,7 @@ class AddOrCheckUserSerializer(serializers.ModelSerializer):
 #   1. Using the search bar on the gallery page to search artwork by
 #   its various types (artist_name, title, etc.)
 class ArtworkSearchInputSerializer(serializers.ModelSerializer):
-    keyword = serializers.CharField()  # type: string
+    keyword = serializers.CharField(required=False)  # type: string
 
     class Meta:
         model = Artwork
@@ -274,7 +275,8 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         # grab the address value
         address = validated_data.get("address")
         # find where there's a match on the user_type input
-        user_type_instance = UserType.objects.filter(user_type=user_type_value).first()
+        user_type_instance = UserType.objects.filter(
+            user_type=user_type_value).first()
         # if no match is found
         if not user_type_instance:
             raise rest_serializers.ValidationError(
@@ -339,13 +341,15 @@ class AddArtworkSerializer(serializers.ModelSerializer):
         # relational table
 
         # Get or create a new artist in table: Artist
-        artist_instance, created = Artist.objects.get_or_create(artist_name=artist_name)
+        artist_instance, created = Artist.objects.get_or_create(
+            artist_name=artist_name)
 
         donor_instance = None
         # Check if donor_name exists
         if donor_name:
             # Get or create a new donor in table: Donor
-            donor_instance, created = Donor.objects.get_or_create(donor_name=donor_name)
+            donor_instance, created = Donor.objects.get_or_create(
+                donor_name=donor_name)
 
         # Get or create a new location in table Location
         location_instance, created = Location.objects.get_or_create(
@@ -361,7 +365,8 @@ class AddArtworkSerializer(serializers.ModelSerializer):
             image_path=img_path_name
         )
 
-        image_path_instance.save()  # not sure why I need to save this but it's breaking if I don't
+        # not sure why I need to save this but it's breaking if I don't
+        image_path_instance.save()
 
         # Create an Artwork instance, associating it with the Artist, Donor, Location, and Category instances
         artwork_instance = Artwork.objects.create(
@@ -397,19 +402,23 @@ class EditArtworkSerializer(serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
 
         if artist_data:
-            artist_instance, created = Artist.objects.get_or_create(**artist_data)
+            artist_instance, created = Artist.objects.get_or_create(
+                **artist_data)
             instance.artist = artist_instance
         if donor_data:
             donor_instance, created = Donor.objects.get_or_create(**donor_data)
             instance.donor = donor_instance
         if location_data:
-            location_instance, created = Location.objects.get_or_create(**location_data)
+            location_instance, created = Location.objects.get_or_create(
+                **location_data)
             instance.location = location_instance
         if category_data:
-            category_instance, created = Category.objects.get_or_create(**category_data)
+            category_instance, created = Category.objects.get_or_create(
+                **category_data)
             instance.category = category_instance
         if image_path:
-            image_path_instance, created = Images.objects.get_or_create(**image_path)
+            image_path_instance, created = Images.objects.get_or_create(
+                **image_path)
             instance.image_path = image_path_instance
 
         # Update the fields of the instance manually

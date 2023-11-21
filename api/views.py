@@ -100,7 +100,8 @@ class CurrentUserPrivs(APIView):
                 )
             # Bad, request trying to elevate privs of a user that does not exist
             else:
-                error_message = {"error": "User with the given address does not exist."}
+                error_message = {
+                    "error": "User with the given address does not exist."}
                 # return BAD request if invalid serializer
                 return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
         # return BAD request if invalid serializer
@@ -119,6 +120,12 @@ class ArtworkSearchView(APIView):
         keywords = request.data.get("keyword")
         # place all keywords in a list
         keyword_list = keywords.split() if keywords else []
+        print("keyword list: ", keyword_list)
+
+        # if no keywords are given send everything
+        if keyword_list == []:
+            results = ArtworkSerializer(Artwork.objects.all(), many=True)
+            return Response(results.data, status=status.HTTP_200_OK)
         queryset = Artwork.objects.none()
         # filter for each keyword
         for kw in keyword_list:
@@ -139,6 +146,8 @@ class ArtworkSearchView(APIView):
 
         # return matching results
         results = ArtworkSerializer(queryset, many=True)
+        if len(queryset) == 0:
+            print("No match in database")
         return Response(results.data, status=status.HTTP_200_OK)
 
 
