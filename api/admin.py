@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import CustomUser, Category, Location, Donor, Artist, Artwork, MigrationRequest, ArtworkImage
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Permission
 
 try:
     from rest_framework.authtoken.models import TokenProxy as DRFToken
@@ -7,6 +9,8 @@ except ImportError:
     from rest_framework.authtoken.models import Token as DRFToken
 
 admin.site.unregister(DRFToken)
+# admin.site.unregister(UserAdmin)
+# admin.site.unregister(Permission)
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):

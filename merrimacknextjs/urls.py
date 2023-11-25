@@ -22,7 +22,7 @@ from .views import home, gallery, request, about, ProxyView
 from django.views.generic import TemplateView
 from django.views.decorators.csrf import csrf_exempt
 
-admin.site.site_url = 'http://localhost:3000'  # Removes the 'View Site' link
+admin.site.site_url = 'https://9djns7kv-3000.use.devtunnels.ms/'  # Removes the 'View Site' link
 admin.site.site_header = 'NextJs site'
 
 urlpatterns = [
