@@ -2,10 +2,11 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/python:3.8.4
+      - image: cimg/python:3.12.0
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
+      - image: cimg/mysql:8.0
     steps:
       - checkout
       - run:
