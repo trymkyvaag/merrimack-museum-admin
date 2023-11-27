@@ -10,3 +10,5 @@ User Manual: [Docs](https://docs.google.com/document/d/1A4O2JbFHMRBCYV31WlWYrLg0
 
 Technical Specification: [Docs](https://docs.google.com/document/d/1qYeovXFJY1xzt0wfRcwvdVOZFXlfNfs6IQgMHTh9h1w/edit?usp=sharing)
 
+Report Out: [Docs](https://docs.google.com/document/d/1a6BSyyV4_rG4Qx_3Ss4xRJLIJmNCYmHIwqGGctEBYdo/edit?usp=sharing)
+
