@@ -12,7 +12,7 @@ class Artist(models.Model):
     idartist = models.AutoField(
         db_column="idArtist", primary_key=True
     )  # Field name made lowercase.
-    artist_name = models.CharField(max_length=40)
+    artist_name = models.CharField(max_length=40, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -25,7 +25,7 @@ class Artwork(models.Model):
     )  # Field name made lowercase.
     title = models.CharField(max_length=50, blank=True, null=True)
     date_created_month = models.IntegerField(blank=True, null=True)
-    date_created_year = models.TextField(
+    date_created_year = models.IntegerField(
         blank=True, null=True
     )  # This field type is a guess.
     comments = models.CharField(max_length=255, blank=True, null=True)

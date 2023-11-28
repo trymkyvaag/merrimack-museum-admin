@@ -298,13 +298,13 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 #   1. Admin needs to add a new artwork entry into the database
 class AddArtworkSerializer(serializers.ModelSerializer):
     # Input fields the foreign keys in an artwork
-    artist_name = serializers.CharField(write_only=True)
+    artist_name = serializers.CharField(write_only=True, required=False)
     donor_name = serializers.CharField(
         write_only=True, required=False
     )  # donor name is not required
-    location = serializers.CharField(write_only=True)
-    category = serializers.CharField(write_only=True)
-    image_path = serializers.CharField(write_only=True)
+    location = serializers.CharField(write_only=True, required=False)
+    category = serializers.CharField(write_only=True, required=False)
+    image_path = serializers.CharField(write_only=True, required=False)
 
     # custom class using the artwork model
     class Meta:
@@ -329,17 +329,22 @@ class AddArtworkSerializer(serializers.ModelSerializer):
     # create method for adding the artwork
     def create(self, validated_data):
         # Extract artist_name, donor_name, location_name, and category_name VALUES from the validated data
-        artist_name = validated_data.pop("artist_name")
+        artist_name = validated_data.pop("artist_name", None)
         donor_name = validated_data.pop("donor_name", None)
-        location_name = validated_data.pop("location")
-        category_name = validated_data.pop("category")
-        img_path_name = validated_data.pop("image_path")
+        location_name = validated_data.pop("location", None)
+        category_name = validated_data.pop("category", None)
+        img_path_name = validated_data.pop("image_path", None)
 
         # FOR EACH instance of the extracted values, get or create them in the corresponding
         # relational table
 
         # Get or create a new artist in table: Artist
-        artist_instance, created = Artist.objects.get_or_create(artist_name=artist_name)
+        artist_instance = None
+        # Check if donor_name exists
+        if artist_name:
+            artist_instance, created = Artist.objects.get_or_create(
+                artist_name=artist_name
+            )
 
         donor_instance = None
         # Check if donor_name exists
@@ -348,14 +353,20 @@ class AddArtworkSerializer(serializers.ModelSerializer):
             donor_instance, created = Donor.objects.get_or_create(donor_name=donor_name)
 
         # Get or create a new location in table Location
-        location_instance, created = Location.objects.get_or_create(
-            location=location_name
-        )
+        location_instance = None
+        # Check if donor_name exists
+        if location_name:
+            location_instance, created = Location.objects.get_or_create(
+                location=location_name
+            )
 
         # Get or create a new category in table: Category
-        category_instance, created = Category.objects.get_or_create(
-            category=category_name
-        )
+        category_instance = None
+        # Check if donor_name exists
+        if category_name:
+            category_instance, created = Category.objects.get_or_create(
+                category=category_name
+            )
         # Get or create a new image_path in table: Images
         image_path_instance, created = Images.objects.get_or_create(
             image_path=img_path_name
