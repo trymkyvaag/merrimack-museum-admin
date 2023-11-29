@@ -16,27 +16,37 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `donor`
+-- Table structure for table `auth_user`
 --
 
-DROP TABLE IF EXISTS `donor`;
+DROP TABLE IF EXISTS `auth_user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `donor` (
-  `idDonor` int NOT NULL AUTO_INCREMENT,
-  `donor_name` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`idDonor`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `auth_user` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `password` varchar(128) NOT NULL,
+  `last_login` datetime(6) DEFAULT NULL,
+  `is_superuser` tinyint(1) NOT NULL,
+  `username` varchar(150) NOT NULL,
+  `first_name` varchar(150) NOT NULL,
+  `last_name` varchar(150) NOT NULL,
+  `email` varchar(254) NOT NULL,
+  `is_staff` tinyint(1) NOT NULL,
+  `is_active` tinyint(1) NOT NULL,
+  `date_joined` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `donor`
+-- Dumping data for table `auth_user`
 --
 
-LOCK TABLES `donor` WRITE;
-/*!40000 ALTER TABLE `donor` DISABLE KEYS */;
-INSERT INTO `donor` VALUES (17,'test'),(18,'newDonor'),(19,'testyyyyy'),(20,'new value'),(21,'newbie'),(23,'No donor'),(24,'no one'),(25,'Markyboi'),(26,'me'),(27,'phone'),(28,'Mark'),(29,'');
-/*!40000 ALTER TABLE `donor` ENABLE KEYS */;
+LOCK TABLES `auth_user` WRITE;
+/*!40000 ALTER TABLE `auth_user` DISABLE KEYS */;
+INSERT INTO `auth_user` VALUES (1,'pbkdf2_sha256$600000$GhdIbJsHPq7n2OYQQ3Brb0$8B2fclSddjb1atW/5fbft5iHK0k3VCVEVVqmRfjk9xw=',NULL,1,'markcase','','','mark.case102@gmail.com',1,1,'2023-11-19 19:58:54.594912'),(2,'pbkdf2_sha256$600000$nJneqpdToKN1dWuqaDLxqU$jkoQqphsr5OanJeVQ+LbuSRo5Nm3DF3q/jy+S8c7xCg=','2023-11-20 17:45:02.860379',1,'mark','','','mark.case102@gmail.com',1,1,'2023-11-20 17:44:43.313493');
+/*!40000 ALTER TABLE `auth_user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

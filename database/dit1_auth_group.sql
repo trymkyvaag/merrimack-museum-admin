@@ -16,27 +16,28 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `donor`
+-- Table structure for table `auth_group`
 --
 
-DROP TABLE IF EXISTS `donor`;
+DROP TABLE IF EXISTS `auth_group`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `donor` (
-  `idDonor` int NOT NULL AUTO_INCREMENT,
-  `donor_name` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`idDonor`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `auth_group` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(150) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `donor`
+-- Dumping data for table `auth_group`
 --
 
-LOCK TABLES `donor` WRITE;
-/*!40000 ALTER TABLE `donor` DISABLE KEYS */;
-INSERT INTO `donor` VALUES (17,'test'),(18,'newDonor'),(19,'testyyyyy'),(20,'new value'),(21,'newbie'),(23,'No donor'),(24,'no one'),(25,'Markyboi'),(26,'me'),(27,'phone'),(28,'Mark'),(29,'');
-/*!40000 ALTER TABLE `donor` ENABLE KEYS */;
+LOCK TABLES `auth_group` WRITE;
+/*!40000 ALTER TABLE `auth_group` DISABLE KEYS */;
+INSERT INTO `auth_group` VALUES (1,'AddArtwork');
+/*!40000 ALTER TABLE `auth_group` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
