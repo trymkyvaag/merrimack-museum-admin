@@ -298,12 +298,14 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 #   1. Admin needs to add a new artwork entry into the database
 class AddArtworkSerializer(serializers.ModelSerializer):
     # Input fields the foreign keys in an artwork
-    artist_name = serializers.CharField(write_only=True, required=False)
+    artist_name = serializers.CharField(
+        write_only=True, required=False, allow_null=True
+    )
     donor_name = serializers.CharField(
-        write_only=True, required=False
+        write_only=True, required=False, allow_null=True
     )  # donor name is not required
-    location = serializers.CharField(write_only=True, required=False)
-    category = serializers.CharField(write_only=True, required=False)
+    location = serializers.CharField(write_only=True, required=False, allow_null=True)
+    category = serializers.CharField(write_only=True, required=False, allow_null=True)
     image_path = serializers.CharField(write_only=True, required=False)
 
     # custom class using the artwork model
@@ -339,40 +341,37 @@ class AddArtworkSerializer(serializers.ModelSerializer):
         # relational table
 
         # Get or create a new artist in table: Artist
-        artist_instance = None
-        # Check if donor_name exists
-        if artist_name:
-            artist_instance, created = Artist.objects.get_or_create(
-                artist_name=artist_name
-            )
+        artist_instance, created = (
+            Artist.objects.get_or_create(artist_name=artist_name)
+            if artist_name
+            else (None, False)
+        )
 
-        donor_instance = None
-        # Check if donor_name exists
-        if donor_name:
-            # Get or create a new donor in table: Donor
-            donor_instance, created = Donor.objects.get_or_create(donor_name=donor_name)
+        # Get or create a new donor in table: Donor
+        donor_instance, created = (
+            Donor.objects.get_or_create(donor_name=donor_name)
+            if donor_name
+            else (None, False)
+        )
 
-        # Get or create a new location in table Location
-        location_instance = None
-        # Check if donor_name exists
-        if location_name:
-            location_instance, created = Location.objects.get_or_create(
-                location=location_name
-            )
+        # Get or create a new location in table: Location
+        location_instance, created = (
+            Location.objects.get_or_create(location=location_name)
+            if location_name
+            else (None, False)
+        )
 
         # Get or create a new category in table: Category
-        category_instance = None
-        # Check if donor_name exists
-        if category_name:
-            category_instance, created = Category.objects.get_or_create(
-                category=category_name
-            )
+        category_instance, created = (
+            Category.objects.get_or_create(category=category_name)
+            if category_name
+            else (None, False)
+        )
+
         # Get or create a new image_path in table: Images
         image_path_instance, created = Images.objects.get_or_create(
             image_path=img_path_name
         )
-
-        # not sure why I need to save this but it's breaking if I don't
         image_path_instance.save()
 
         # Create an Artwork instance, associating it with the Artist, Donor, Location, and Category instances

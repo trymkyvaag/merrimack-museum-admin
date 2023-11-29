@@ -100,8 +100,7 @@ class CurrentUserPrivs(APIView):
                 )
             # Bad, request trying to elevate privs of a user that does not exist
             else:
-                error_message = {
-                    "error": "User with the given address does not exist."}
+                error_message = {"error": "User with the given address does not exist."}
                 # return BAD request if invalid serializer
                 return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
         # return BAD request if invalid serializer
@@ -280,7 +279,7 @@ class AddArtwork(APIView):
     def post(self, request, format=None):
         # get data from serializer
         serializer = self.serializer_class(data=request.data)
-
+        print(serializer)
         if serializer.is_valid():
             serializer.save()  # Save data
             return Response(serializer.data, status=status.HTTP_201_CREATED)

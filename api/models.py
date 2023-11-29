@@ -31,7 +31,7 @@ class Artwork(models.Model):
     comments = models.CharField(max_length=255, blank=True, null=True)
     width = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
     height = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
-    artist = models.ForeignKey(Artist, models.DO_NOTHING, blank=True, null=True)
+    artist = models.ForeignKey("Artist", models.DO_NOTHING, blank=True, null=True)
     donor = models.ForeignKey("Donor", models.DO_NOTHING, blank=True, null=True)
     location = models.ForeignKey("Location", models.DO_NOTHING, blank=True, null=True)
     category = models.ForeignKey("Category", models.DO_NOTHING, blank=True, null=True)
