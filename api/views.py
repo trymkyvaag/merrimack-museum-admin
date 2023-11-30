@@ -36,7 +36,10 @@ class ArtworksListFiltered(APIView):
 
     def get(self, request, format=None):
         # Query artworks that do not have a corresponding move request with is_pending set to 1
-        artworks = Artwork.objects.exclude(moverequest__is_pending=1)
+        artworks = Artwork.objects.exclude(
+            Q(moverequest__is_pending=1)
+            | Q(moverequest__is_approved=1, moverequest__is_complete=0)
+        )
 
         # Serialize the queryset
         serializer = self.serializer_class(artworks, many=True)
@@ -324,8 +327,23 @@ class MigrationsList(APIView):
     # 'get' request type
     def get(self, request, format=None):
         # Filter MoveRequest objects where is_pending is equal to 1
-        artworks = MoveRequest.objects.filter(is_pending=1)
+        artworks = MoveRequest.objects.filter(Q(is_pending=1) & Q(is_complete=0))
+        # Serialize the queryset
+        serializer = self.serializer_class(artworks, many=True)
 
+        # Return serialized data
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class MigrationsApprovedList(APIView):
+    serializer_class = MoveRequestSerializer
+
+    # 'get' request type
+    def get(self, request, format=None):
+        # Filter MoveRequest objects where is_pending is equal to 1
+        artworks = MoveRequest.objects.filter(
+            Q(is_pending=0) & Q(is_approved=1) & Q(is_complete=0)
+        )
         # Serialize the queryset
         serializer = self.serializer_class(artworks, many=True)
 
@@ -353,6 +371,42 @@ class MigrationsUpdate(APIView):
                 artwork.is_approved = 1
             else:
                 artwork.is_approved = 0
+
+            # Save the updated object
+            artwork.save()
+
+            # Serialize the updated object
+            serializer = self.serializer_class(artwork)
+
+            # Return serialized data
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except MoveRequest.DoesNotExist:
+            return Response(
+                {"error": "MoveRequest not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class MigrationsCompleteUpdate(APIView):
+    serializer_class = MoveRequestUpdateSerializer
+
+    # 'put' request type for updating is_pending and is_approved
+    def put(self, request, pk, format=None):
+        try:
+            # Retrieve the MoveRequest object with the given primary key (pk)
+            artwork = MoveRequest.objects.get(pk=pk)
+
+            # Update is_pending to 0
+
+            # Check the input string and update is_approved accordingly
+            approval_status = request.data.get(
+                "type"
+            )  # Assuming the input string is passed in the request data
+            if approval_status == "complete":
+                artwork.is_complete = 1
+                artwork.is_pending = 0
+            else:
+                artwork.is_approved = 0
+                artwork.is_pending = 1
 
             # Save the updated object
             artwork.save()

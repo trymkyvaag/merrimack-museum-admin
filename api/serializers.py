@@ -193,6 +193,7 @@ class MoveRequestSubmitionSerializer(serializers.ModelSerializer):
             "to_location",
             "is_pending",
             "is_approved",
+            "is_complete",
             "comments",
             "time_stamp",
         ]
@@ -326,6 +327,7 @@ class AddArtworkSerializer(serializers.ModelSerializer):
             "location",
             "category",
             "image_path",
+            "size",
         )
 
     # create method for adding the artwork
@@ -436,6 +438,7 @@ class EditArtworkSerializer(serializers.ModelSerializer):
         instance.comments = validated_data.get("comments", instance.comments)
         instance.width = validated_data.get("width", instance.width)
         instance.height = validated_data.get("height", instance.height)
+        instance.size = validated_data.get("size", instance.size)
 
         instance.save()
         return instance

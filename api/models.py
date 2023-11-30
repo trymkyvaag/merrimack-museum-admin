@@ -36,6 +36,7 @@ class Artwork(models.Model):
     location = models.ForeignKey("Location", models.DO_NOTHING, blank=True, null=True)
     category = models.ForeignKey("Category", models.DO_NOTHING, blank=True, null=True)
     image_path = models.ForeignKey("Images", models.DO_NOTHING, blank=True, null=True)
+    size = models.CharField(max_length=10, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -95,6 +96,7 @@ class MoveRequest(models.Model):
     comments = models.CharField(max_length=200, blank=True, null=True)
     user = models.ForeignKey("User", models.DO_NOTHING)
     time_stamp = models.DateTimeField()
+    is_complete = models.IntegerField()
 
     class Meta:
         managed = False

@@ -60,10 +60,20 @@ urlpatterns = [
     # Updates artwork
     path("update-artwork/<int:pk>/", EditArtwork.as_view(), name="edit-artwork"),
     path("migrations-get/", MigrationsList.as_view(), name="migrations-get"),
+    path(
+        "migrations-get-approved/",
+        MigrationsApprovedList.as_view(),
+        name="migrations-get-approved",
+    ),
     # Path for the 'put' request, including the primary key (pk) parameter
     path(
         "migrations-update/<int:pk>/",
         MigrationsUpdate.as_view(),
         name="migrations-update",
+    ),
+    path(
+        "migrations-update-complete/<int:pk>/",
+        MigrationsCompleteUpdate.as_view(),
+        name="migrations-update-complete",
     ),
 ]
