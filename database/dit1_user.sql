@@ -38,7 +38,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'casem@merrimack.edu',1),(2,'kyvagt@merrimack.edu',1),(3,'mwauram@merrimack.edu',2),(60,'mark.case102@gmail.com',1),(66,'kyvaagt@merrimack.edu',3);
+INSERT INTO `user` VALUES (1,'casem@merrimack.edu',1),(2,'kyvagt@merrimack.edu',1),(3,'mwauram@merrimack.edu',1),(60,'mark.case102@gmail.com',1),(66,'kyvaagt@merrimack.edu',1);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -51,4 +51,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-28 20:29:51
+-- Dump completed on 2023-11-29 21:03:32

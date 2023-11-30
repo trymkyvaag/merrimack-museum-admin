@@ -26,7 +26,7 @@ CREATE TABLE `donor` (
   `idDonor` int NOT NULL AUTO_INCREMENT,
   `donor_name` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`idDonor`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -35,7 +35,7 @@ CREATE TABLE `donor` (
 
 LOCK TABLES `donor` WRITE;
 /*!40000 ALTER TABLE `donor` DISABLE KEYS */;
-INSERT INTO `donor` VALUES (17,'test'),(18,'newDonor'),(19,'testyyyyy'),(20,'new value'),(21,'newbie'),(23,'No donor'),(24,'no one'),(25,'Markyboi'),(26,'me'),(27,'phone'),(28,'Mark'),(29,'');
+INSERT INTO `donor` VALUES (17,'test'),(18,'newDonor'),(19,'testyyyyy'),(20,'new value'),(21,'newbie'),(23,'No donor'),(24,'no one'),(25,'Markyboi'),(26,'me'),(27,'phone'),(28,'Mark'),(29,''),(30,'efes'),(31,NULL);
 /*!40000 ALTER TABLE `donor` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -48,4 +48,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-28 20:29:52
+-- Dump completed on 2023-11-29 21:03:33
