@@ -411,6 +411,23 @@ class MigrationsCompleteUpdate(APIView):
             # Save the updated object
             artwork.save()
 
+            # Retrieve the related Artwork object using pkArtwork
+            pk_artwork = request.data.get("idArtwork")
+            print(pk_artwork)
+            artworkToUpdate = Artwork.objects.get(pk=pk_artwork)
+
+            print(artworkToUpdate)
+            # Create or retrieve the Location object based on the new_location string
+            new_location_str = request.data.get("location")
+            print(new_location_str)
+            location, created = Location.objects.get_or_create(
+                location=new_location_str
+            )
+            print(location)
+            # Update the location field in the Artwork model
+            artworkToUpdate.location = location
+            artworkToUpdate.save()
+
             # Serialize the updated object
             serializer = self.serializer_class(artwork)
 
