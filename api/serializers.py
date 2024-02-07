@@ -82,7 +82,7 @@ class MoveRequestSerializer(serializers.ModelSerializer):
 
 # ------------------------------------------------------------------------------------------------------------------
 # Login Page Endpoints
-
+#new year new start
 
 # AddOrCheckUserSerializer -> GOAL: Given an (email) address,
 # check whether they need to be added to the database as a new user or not.
