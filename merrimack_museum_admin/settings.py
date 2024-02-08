@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-yad_&l8djbl=ss^lcv!&nj#vrt^#9*$s-#zvmm^xct1v3lp(=m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['*', '.localhost', '127.0.0.1', '[::1]']
 
 
 # Application definition
@@ -110,6 +110,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 CORS_ALLOW_METHODS = [
     "DELETE",
@@ -129,6 +131,7 @@ CORS_ALLOW_HEADERS = [
     "user-agent",
     "x-csrftoken",
     "x-requested-with",
+    "Cache-Control"
 ]
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

@@ -58,7 +58,7 @@ class AddOrCheckUser(APIView):
     def post(self, request, format=None):
         # grab data from serializer
         serializer = self.serializer_class(data=request.data)
-
+        print(request.data)
         if serializer.is_valid():
             # get (email) address value
             address = serializer.validated_data["address"]

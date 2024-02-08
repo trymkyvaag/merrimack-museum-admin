@@ -4,3 +4,4 @@
 */__pychache__/*
 */migrations/*.pyc
 */migrations/*.py
+get-pip.py
