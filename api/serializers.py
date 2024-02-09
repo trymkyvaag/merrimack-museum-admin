@@ -82,7 +82,7 @@ class MoveRequestSerializer(serializers.ModelSerializer):
 
 # ------------------------------------------------------------------------------------------------------------------
 # Login Page Endpoints
-#new year new start
+# new year new start
 
 # AddOrCheckUserSerializer -> GOAL: Given an (email) address,
 # check whether they need to be added to the database as a new user or not.
@@ -104,14 +104,15 @@ class AddOrCheckUserSerializer(serializers.ModelSerializer):
     # validated_data: address: "string"
     def create(self, validated_data):
         # gets the value from the inputed string address
-        address = validated_data.get("address")
+        address = validated_data.get("email")
         # Check if the user already exists with the given email address
         # by searching in the User table
         existing_user = User.objects.filter(address=address).first()
         # If the user doesn't exist, create a new user
         if not existing_user:
             # Get or create the UserType instance with a user_type of "student"
-            user_type, created = UserType.objects.get_or_create(user_type="Student")
+            user_type, created = UserType.objects.get_or_create(
+                user_type="Student")
             # Set new user's user_type as student
             validated_data["user_type"] = user_type
             # Save the all the data to the database and return info to client
@@ -275,7 +276,8 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         # grab the address value
         address = validated_data.get("address")
         # find where there's a match on the user_type input
-        user_type_instance = UserType.objects.filter(user_type=user_type_value).first()
+        user_type_instance = UserType.objects.filter(
+            user_type=user_type_value).first()
         # if no match is found
         if not user_type_instance:
             raise rest_serializers.ValidationError(
@@ -305,8 +307,10 @@ class AddArtworkSerializer(serializers.ModelSerializer):
     donor_name = serializers.CharField(
         write_only=True, required=False, allow_null=True
     )  # donor name is not required
-    location = serializers.CharField(write_only=True, required=False, allow_null=True)
-    category = serializers.CharField(write_only=True, required=False, allow_null=True)
+    location = serializers.CharField(
+        write_only=True, required=False, allow_null=True)
+    category = serializers.CharField(
+        write_only=True, required=False, allow_null=True)
     image_path = serializers.CharField(write_only=True, required=False)
 
     # custom class using the artwork model
@@ -410,19 +414,23 @@ class EditArtworkSerializer(serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
 
         if artist_data:
-            artist_instance, created = Artist.objects.get_or_create(**artist_data)
+            artist_instance, created = Artist.objects.get_or_create(
+                **artist_data)
             instance.artist = artist_instance
         if donor_data:
             donor_instance, created = Donor.objects.get_or_create(**donor_data)
             instance.donor = donor_instance
         if location_data:
-            location_instance, created = Location.objects.get_or_create(**location_data)
+            location_instance, created = Location.objects.get_or_create(
+                **location_data)
             instance.location = location_instance
         if category_data:
-            category_instance, created = Category.objects.get_or_create(**category_data)
+            category_instance, created = Category.objects.get_or_create(
+                **category_data)
             instance.category = category_instance
         if image_path:
-            image_path_instance, created = Images.objects.get_or_create(**image_path)
+            image_path_instance, created = Images.objects.get_or_create(
+                **image_path)
             instance.image_path = image_path_instance
 
         # Update the fields of the instance manually

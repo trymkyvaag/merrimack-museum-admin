@@ -58,10 +58,15 @@ class AddOrCheckUser(APIView):
     def post(self, request, format=None):
         # grab data from serializer
         serializer = self.serializer_class(data=request.data)
+        print("\n\n\n")
         print(request.data)
+
         if serializer.is_valid():
+            print(f"Serializer data: {serializer.validated_data.keys()}")
             # get (email) address value
-            address = serializer.validated_data["address"]
+            print("\n\n\n")
+
+            address = serializer.validated_data["adress"]
 
             # Check if a user with the given address already exists
             existing_user = User.objects.filter(address=address).first()
@@ -103,7 +108,8 @@ class CurrentUserPrivs(APIView):
                 )
             # Bad, request trying to elevate privs of a user that does not exist
             else:
-                error_message = {"error": "User with the given address does not exist."}
+                error_message = {
+                    "error": "User with the given address does not exist."}
                 # return BAD request if invalid serializer
                 return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
         # return BAD request if invalid serializer
@@ -119,7 +125,13 @@ class ArtworkSearchView(APIView):
     serializer_class = ArtworkSearchInputSerializer
 
     def post(self, request, format=None):
-        keywords = request.data.get("keyword")
+        print("\n\n\n")
+        print("In artworkserializer:")
+        print(request.data)
+        keywords = request.data.get("keyword") if request.data != 'All' else {
+            'keyword': ['']}
+        print("\n\n\n")
+
         # place all keywords in a list
         keyword_list = keywords.split() if keywords else []
         print("keyword list: ", keyword_list)
@@ -327,7 +339,8 @@ class MigrationsList(APIView):
     # 'get' request type
     def get(self, request, format=None):
         # Filter MoveRequest objects where is_pending is equal to 1
-        artworks = MoveRequest.objects.filter(Q(is_pending=1) & Q(is_complete=0))
+        artworks = MoveRequest.objects.filter(
+            Q(is_pending=1) & Q(is_complete=0))
         # Serialize the queryset
         serializer = self.serializer_class(artworks, many=True)
 
