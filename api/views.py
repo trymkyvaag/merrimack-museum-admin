@@ -59,14 +59,14 @@ class AddOrCheckUser(APIView):
         # grab data from serializer
         serializer = self.serializer_class(data=request.data)
         print("\n\n\n")
-        print(request.data)
+        print(f'in addorcheckSER: {request.data}')
 
         if serializer.is_valid():
             print(f"Serializer data: {serializer.validated_data.keys()}")
             # get (email) address value
             print("\n\n\n")
 
-            address = serializer.validated_data["adress"]
+            address = serializer.validated_data["address"]
 
             # Check if a user with the given address already exists
             existing_user = User.objects.filter(address=address).first()
@@ -125,12 +125,14 @@ class ArtworkSearchView(APIView):
     serializer_class = ArtworkSearchInputSerializer
 
     def post(self, request, format=None):
-        print("\n\n\n")
-        print("In artworkserializer:")
-        print(request.data)
-        keywords = request.data.get("keyword") if request.data != 'All' else {
-            'keyword': ['']}
-        print("\n\n\n")
+        # print("\n\n\n")
+        # print("In artworkserializer:")
+        # print(f"data:{request.data}")
+        keywords = request.data.get(
+            "keyword") if request.data != 'All' else None
+        # print(f"keywords:{request.data}")
+
+        # print("\n\n\n")
 
         # place all keywords in a list
         keyword_list = keywords.split() if keywords else []
