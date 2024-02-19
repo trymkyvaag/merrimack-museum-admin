@@ -104,7 +104,8 @@ class AddOrCheckUserSerializer(serializers.ModelSerializer):
     # validated_data: address: "string"
     def create(self, validated_data):
         # gets the value from the inputed string address
-        address = validated_data.get("email")
+        address = validated_data.get('address')
+        print(f"adress: {address}")
         # Check if the user already exists with the given email address
         # by searching in the User table
         existing_user = User.objects.filter(address=address).first()

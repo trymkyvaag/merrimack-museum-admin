@@ -59,28 +59,32 @@ class AddOrCheckUser(APIView):
         # grab data from serializer
         serializer = self.serializer_class(data=request.data)
         print("\n\n\n")
-        print(f'in addorcheckSER: {request.data}')
+        print('in addorcheckSER:', request.data)
+        print('request.data:', end=' ')
+        print(request.data)
 
         if serializer.is_valid():
-            print(f"Serializer data: {serializer.validated_data.keys()}")
+            print(f"Serializer data: {serializer.validated_data}")
             # get (email) address value
             print("\n\n\n")
 
-            address = serializer.validated_data["address"]
+            address = serializer.validated_data["address"] if len(serializer.validated_data.keys()) > 1 else None
+            if address:
+                # Check if a user with the given address already exists
+                existing_user = User.objects.filter(address=address).first()
 
-            # Check if a user with the given address already exists
-            existing_user = User.objects.filter(address=address).first()
+                if existing_user:
+                    # If the user exists, return the existing user's information
+                    return Response(
+                        AddOrCheckUserSerializer(existing_user).data,
+                        status=status.HTTP_200_OK,
+                    )
+                else:
+                    # If the user doesn't exist, save new user and return info
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
 
-            if existing_user:
-                # If the user exists, return the existing user's information
-                return Response(
-                    AddOrCheckUserSerializer(existing_user).data,
-                    status=status.HTTP_200_OK,
-                )
-            else:
-                # If the user doesn't exist, save new user and return info
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
         # return BAD request if invalid serializer
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
