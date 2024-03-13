@@ -68,7 +68,8 @@ class AddOrCheckUser(APIView):
             # get (email) address value
             print("\n\n\n")
 
-            address = serializer.validated_data["address"] if len(serializer.validated_data.keys()) > 1 else None
+            address = serializer.validated_data["address"] if len(
+                serializer.validated_data.keys()) > 1 else None
             if address:
                 # Check if a user with the given address already exists
                 existing_user = User.objects.filter(address=address).first()
@@ -83,7 +84,6 @@ class AddOrCheckUser(APIView):
                     # If the user doesn't exist, save new user and return info
                     serializer.save()
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
 
         # return BAD request if invalid serializer
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -203,6 +203,7 @@ class RandomArtworkViewInt(APIView):
 
 # Uses RandomArtworkSerializer and ArtworkSerializer
 # Used for recieving string inputs
+    #
 class RandomArtworkViewAll(APIView):
     serializer_class = RandomArtworkSerializerAll
 
