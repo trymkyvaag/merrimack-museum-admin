@@ -68,8 +68,7 @@ class AddOrCheckUser(APIView):
             # get (email) address value
             print("\n\n\n")
 
-            address = serializer.validated_data["address"] if len(
-                serializer.validated_data.keys()) > 1 else None
+            address = serializer.validated_data["address"]
             if address:
                 # Check if a user with the given address already exists
                 existing_user = User.objects.filter(address=address).first()
